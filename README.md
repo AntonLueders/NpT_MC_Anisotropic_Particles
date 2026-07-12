@@ -6,6 +6,12 @@ This repository contains the NpT MC simulation software used to obtain the data 
 
 The different folders contain individual programs for the different hard convex particles. All information and methods employed are described in detail in the supporting information of [1]. While the programs can be used to repeat the corresponding simulations, we strongly encourage a full independent reproduction using the information in the supplemental information.
 
+# Table of contents:
+ - [ Requirements and how to build the executables](#Requirements)
+ - [How to use the MC programs](#Use)
+ - [Disclaimer](#Disclaimer)
+ - [Cite this software](#Cite)
+
  <a id="Requirements"></a>
 # Requirements and how to build the executables
 
@@ -41,6 +47,24 @@ lambda	1.0
 ```
 
 Here, particular input lines can be vary between the different shapes (the example shows the input for polygons with a finite number of vertices).
+
+The particular lines of such an input file and the meaning of the numbers are summarized in the following list:
+
+- **N:** Number of particles
+- **p:** Pressure
+- **T:** Temperature (the program is only tested for the case where this value is set to unity)
+- **sweeps:** Number of MC sweeps (i.e., steps per particle)
+- **rate:** The particle configuration is saved every "rate" sweeps.
+- **a:** Length scale of the particles. For polygons, this is the distance between the center and the vertices for the regular reference body before deformation. For ellipses, this is the larger semi-axis.
+- **seed:** Random seed.
+- **delta:** Displacement for translational random moves.
+- **delta_r:** Displacements for rotational random moves.
+- **delta_V:** Increment corresponding to the MC step of the system area.
+- **r_v:** Verlet-radius of the used Verlet lists.
+- **m:** Number of vertices.
+- **lambda:** Scaling factor used to deform the regular polygons.
+
+Note that the word and number separation in the input file should be done with the **tab key** (the program is only tested for this case).  
 
  <a id="Disclaimer"></a>
 # Disclaimer
