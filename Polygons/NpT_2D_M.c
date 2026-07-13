@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 				counter_acc_rotation += MetropolisRotation(index, P, L);
 			}
 
-			// Volume check
+			// Volume step
 			if (gsl_rng_uniform(generator) < 1. / (double)(N)) {
 				double L_temp = L;
 				L = VolumeMCStep(L, P);
