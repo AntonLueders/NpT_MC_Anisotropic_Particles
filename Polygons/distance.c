@@ -2,6 +2,7 @@
 
 // ----------------------------------------------------------------------------------------
 
+// Rotates vectors
 void RotationMatrix(double *old, double angle, double *newV) {
 	
 	double *old_temp = old;
@@ -9,6 +10,8 @@ void RotationMatrix(double *old, double angle, double *newV) {
 	newV[0] = old_temp[0] * cos(angle) - old_temp[1] * sin(angle);
 	newV[1] = old_temp[0] * sin(angle) + old_temp[1] * cos(angle);
 }
+
+// ----------------------------------------------------------------------------------------
 
 // Periodic boundary conditions (for position)
 inline double PeriodicPos(double dr, double L) {
@@ -30,6 +33,8 @@ inline double PeriodicDis(double dr, double L) {
 
 // ----------------------------------------------------------------------------------------
 
+// This is the first function which is used to check if the particles are even close enouth
+// that checks for overlap are necessary.
 double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijsq = 0.;
@@ -51,9 +56,9 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	return disij;
 }
 
-
 // ----------------------------------------------------------------------------------------
 
+// Calculates the distance between a point and a line.
 double DistancePointLine(double *r, double *corner, double *direction, double length, double *dij) {
 	
 	double position[dim];
@@ -90,6 +95,10 @@ double DistancePointLine(double *r, double *corner, double *direction, double le
 	return sqrt(dijsq);
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Function which calculates the projection of the particles on the candidate for the 
+// separating axis
 void ProjectSAT(double ri[][dim], double *axis, double *min, double *max) {
 	
 	*min = 0.;
@@ -113,6 +122,9 @@ void ProjectSAT(double ri[][dim], double *axis, double *min, double *max) {
 	}
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Implementation of the separating axis theorem
 int CheckOverlapSAT(double ri[][dim], double rj[][dim], double directionsi[][dim], double directionj[][dim]) {
 	
 	double mini = 0.;
@@ -140,6 +152,9 @@ int CheckOverlapSAT(double ri[][dim], double rj[][dim], double directionsi[][dim
 	return 1;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Deforms the polygon shapes by scaling on direction byb lambda
 void Compress(double ri[][dim], double *e) {
 
 	double ri_temp[m][dim];
@@ -166,6 +181,10 @@ void Compress(double ri[][dim], double *e) {
 	}
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Estimates a distance between the two polygons. This function is not important for 
+// calculating the overlap
 double Distanceij(double ri[][dim], double cornerj[][dim], double directionj[][dim], double *length) {
 	
 	double r_temp[dim];
@@ -199,6 +218,9 @@ double Distanceij(double ri[][dim], double cornerj[][dim], double directionj[][d
 	return dis;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Checks for overlap between two polygons
 double Distance(Particle *p_i, Particle *p_j, double L) {
 	
 	double rij[dim];
@@ -212,7 +234,9 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 	double directionj[m][dim];
 	double length = 0.5 / sin(M_PI / (double)m) * a;
 	double length_k[m];
-	
+
+	// Constructs the regular polygons via the vectors pointing from the center 
+	// to the vertices
 	double vector_to_corner_i[m][dim];
 	double vector_to_corner_j[m][dim];
 	
@@ -225,7 +249,8 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		RotationMatrix(vector_to_corner_i[i - 1], 2. * M_PI / (double)m, vector_to_corner_i[i]);
 		RotationMatrix(vector_to_corner_j[i - 1], 2. * M_PI / (double)m, vector_to_corner_j[i]);
 	}
-	
+
+	// Deforms the particles
 	if(m % 2 != 0) {	
 		Compress(vector_to_corner_i, p_i->e);
 		Compress(vector_to_corner_j, p_j->e);
@@ -235,14 +260,16 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		Compress(vector_to_corner_i, e_perp_i);
 		Compress(vector_to_corner_j, e_perp_j);
 	}
-	
+
+	// Vectors from the system origin to the vertices
 	for (int k = 0; k < m; k++) {                  
 		for (int d = 0; d < dim; d++) {
 			ri[k][d] = p_i->r[d] + vector_to_corner_i[k][d];
 			cornerj[k][d] = p_i->r[d] + rij[d] + vector_to_corner_j[k][d];
 		}
 	}	
-			
+
+	// Calculates vectors parallel to the polygon edges
 	for(int k = 0; k < m; k++) {
 		int kp1 = k + 1;
 		if (kp1 == m) {
@@ -260,12 +287,15 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 			length_k[k] = sqrt(length_k_temp);
 		}
 	}
-	
+
+	// Uses separating axis theorm check for overlap
 	int checkOverlap = CheckOverlapSAT(ri, cornerj, directioni, directionj);
 	if (checkOverlap == 1) {		
 		return -1.;
 	}
-	
+
+	// Estimates approximations for the distance if the particle do not 
+	// overlap
 	double dis1 = Distanceij(ri, cornerj, directionj, length_k);
 	double dis2 = Distanceij(cornerj, ri, directioni, length_k);
 	
@@ -275,3 +305,5 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		return dis2;
 	}
 }
+
+// ----------------------------------------------------------------------------------------
