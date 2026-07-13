@@ -136,6 +136,8 @@ void ReadInput() {
 	fclose(input);
 }
 
+// ----------------------------------------------------------------------------------------
+
 // Checks for conflicting input
 void CheckForConflict() {
     
@@ -167,3 +169,5 @@ void CheckForConflict() {
         printf("WARNING: Particles can move a larger distance than r_v.\n");
     }
 }
+
+// ----------------------------------------------------------------------------------------
