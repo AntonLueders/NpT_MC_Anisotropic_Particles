@@ -2,6 +2,9 @@
 #include "distance.h"
 #include "verletlist.h"
 
+// ----------------------------------------------------------------------------------------
+
+// Initilizes the simulation
 void InitRandom(Particle *P, double L) {    
 
     long counter_overlap = 0;
@@ -51,3 +54,5 @@ void InitRandom(Particle *P, double L) {
 	
 	printf("Init. successful.\n");
 }
+
+// ----------------------------------------------------------------------------------------
