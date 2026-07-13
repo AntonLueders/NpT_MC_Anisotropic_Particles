@@ -1,6 +1,8 @@
 #include "verletlist.h"
 #include "distance.h"
 
+// ----------------------------------------------------------------------------------------
+
 void GenerateVerletLists(Particle *P, double L, int step) {
 	
 	for (int i = 0; i < N; i++) {
@@ -39,6 +41,8 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 	}
 }
 
+// ----------------------------------------------------------------------------------------
+
 bool CheckVerlet(Particle *P, double L) {
 	
 	double dissq_max[2] = {0., 0.};
@@ -71,6 +75,8 @@ bool CheckVerlet(Particle *P, double L) {
 	return (sqrt(dissq_max[0]) + sqrt(dissq_max[1])) >= (r_v - delta);
 }
 
+// ----------------------------------------------------------------------------------------
+
 void FreeVerLists(Particle *P) {
 
     for(int i = 0; i < N; i++) {
@@ -78,3 +84,5 @@ void FreeVerLists(Particle *P) {
         free(P[i].verList);
     }
 }
+
+// ----------------------------------------------------------------------------------------
