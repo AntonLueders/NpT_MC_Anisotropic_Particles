@@ -22,6 +22,8 @@ inline double PeriodicDis(double dr, double L) {
 
 // ----------------------------------------------------------------------------------------
 
+// This is the first function which is used to check if the particles are even close enouth
+// that checks for overlap are necessary.
 double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijsq = 0.;
@@ -39,6 +41,12 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	return disij;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Contact distance between two ellipses
+// Implemented following the supporting informations of
+// Zheng, X. & Palffy-Muhoray, P. Distance of closest approach of two arbitrary hard ellipses in two dimensions.
+// Phys. Rev. E 75, 061709; 10.1103/PhysRevE.75.061709 (2007).
 double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	double a1 = p_i->a;
@@ -216,3 +224,5 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	return rij_norm - d;
 }
+
+// ----------------------------------------------------------------------------------------
