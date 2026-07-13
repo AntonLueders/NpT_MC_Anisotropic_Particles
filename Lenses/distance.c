@@ -10,6 +10,8 @@ void RotationMatrix(double *old, double angle, double *newV) {
 	newV[1] = old_temp[0] * sin(angle) + old_temp[1] * cos(angle);
 }
 
+// ----------------------------------------------------------------------------------------
+
 double ScalarAngle(double *v1, double *v2) {
 	
 	double result = 0.;
@@ -24,6 +26,8 @@ double ScalarAngle(double *v1, double *v2) {
 	
 	return acos(result / sqrt(abs_v1) / sqrt(abs_v2));
 }
+
+// ----------------------------------------------------------------------------------------
 
 // Periodic boundary conditions (for position)
 inline double PeriodicPos(double dr, double L) {
@@ -45,6 +49,8 @@ inline double PeriodicDis(double dr, double L) {
 
 // ----------------------------------------------------------------------------------------
 
+// This is the first function which is used to check if the particles are even close enouth
+// that checks for overlap are necessary.
 double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijsq = 0.;
@@ -62,6 +68,8 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	return disij;
 }
+
+// ----------------------------------------------------------------------------------------
 
 void CalculateIntersection(double *center_one, double *center_two, double *inter_one, double *inter_two) {
 	
@@ -95,6 +103,8 @@ void CalculateIntersection(double *center_one, double *center_two, double *inter
 	inter_two[0] = center_one[0] + x * diss_vec[0] / diss + y * diss_vec[1] / diss;
 	inter_two[1] = center_one[1] + x * diss_vec[1] / diss - y * diss_vec[0] / diss;
 }
+
+// ----------------------------------------------------------------------------------------
 
 double Distance(Particle *p_i, Particle *p_j, double L) {
 	
@@ -191,3 +201,5 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 	
 	return 2. * b;
 }
+
+// ----------------------------------------------------------------------------------------
