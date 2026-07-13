@@ -22,6 +22,8 @@ inline double PeriodicDis(double dr, double L) {
 
 // ----------------------------------------------------------------------------------------
 
+// This is the first function which is used to check if the particles are even close enouth
+// that checks for overlap are necessary.
 double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijsq = 0.;
@@ -39,6 +41,8 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	return disij;
 }
 
+// ----------------------------------------------------------------------------------------
+
 double Sign(double value, double sign) {
 	
 	if (fabs(sign) <= 1e-10) {
@@ -47,6 +51,10 @@ double Sign(double value, double sign) {
 	return value * sign / fabs(sign);
 }
 
+// ----------------------------------------------------------------------------------------
+
+// This function identifies which ends are interacting to properly assign either the disk
+// or the ellipse shape
 void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	
 	int ellipse1 = 0;
@@ -68,9 +76,7 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	}
 	
 	if (fabs(parallel_check - 1.) < 1e-8) {
-		
-		//printf("1\n");
-		
+
 		double erij[dim];
 
 		for (int d = 0; d < dim; d++) {
@@ -91,9 +97,6 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 		}		
 	} else if (fabs(- parallel_check - 1.) < 1e-8) {
 		
-		//printf("2\n");
-		
-		
 		double erij[dim];
 
 		for (int d = 0; d < dim; d++) {
@@ -113,8 +116,6 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			ellipse2 = 0;
 		}
 	} else {
-		
-		//printf("3\n");	
 		
 		double rij_new[dim];
 		
@@ -159,9 +160,6 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			}
 		}
 		
-		//printf("%f\t%f\n",lambda_prime, (a -0.5) / 2.);
-		//printf("%f\n",mu_prime);
-		
 		if (fabs(lambda_prime + (a - 0.5) / 2.) < 1e-8) {
 			ellipse1 = 0;
 		} else {
@@ -179,6 +177,12 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	ends[1] = ellipse2;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Contact distance between two ellipses
+// Implemented following the supporting informations of
+// Zheng, X. & Palffy-Muhoray, P. Distance of closest approach of two arbitrary hard ellipses in two dimensions.
+// Phys. Rev. E 75, 061709; 10.1103/PhysRevE.75.061709 (2007).
 double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	int ends[2];
@@ -380,3 +384,5 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	return rij_norm - d;
 }
+
+// ----------------------------------------------------------------------------------------
