@@ -58,7 +58,7 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 
 // ----------------------------------------------------------------------------------------
 
-// Calculates the distance between a point and a line.
+// Calculates the distance between a point and a line segment.
 double DistancePointLine(double *r, double *corner, double *direction, double length, double *dij) {
 	
 	double position[dim];
