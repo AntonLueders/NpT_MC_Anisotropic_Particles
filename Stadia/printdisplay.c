@@ -43,13 +43,13 @@ void PrintWelcome() {
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             Last edited: 12.09.2025                              "
+    printf("+             Last edited: 13.07.2026                              "
            "    "
            "      +\n");
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             V2.0.4                                               "
+    printf("+             V2.0.5                                               "
            "          +\n");
     printf("+                                                                  "
            "    "
