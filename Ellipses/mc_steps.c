@@ -16,12 +16,15 @@ int MetropolisTranslation(int index, Particle *P, double L) {
         
 		if (i != index) {
 			double disij = DistanceOverlap(&test_particle, &(P[i]), L);     // See distance.c
-			if(disij < 0.) {
+			double disji = 0.;
+			if (disij < b) {
+				disji = Distance(&(P[i]), &test_particle, L, 0);     // See distance.c
+			}
+			if(disij < 0. || disji < 0.) {
 								
 				return 0;
 			}
 		}
-		
 		current = current->next;
     } 
 	
@@ -34,25 +37,25 @@ int MetropolisTranslation(int index, Particle *P, double L) {
 int MetropolisRotation(int index, Particle *P, double L) {
 	
 	double rand_unity_vector[dim];
-	
-	double rand_angle = 2. * M_PI * gsl_rng_uniform(generator);
-	rand_unity_vector[0] = cos(rand_angle);
-	rand_unity_vector[1] = sin(rand_angle);
-	
-	Particle test_particle = P[index];
-	
-	double esq = 0.;
-	for (int d = 0; d < dim; d++) {
-		test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
-		esq += test_particle.e[d] * test_particle.e[d];
-	}
-	
-	double esq_norm = sqrt(esq);
-	
-	for (int d = 0; d < dim; d++) {
-		test_particle.e[d] /= esq_norm; 
-	}
-	
+
+        double rand_angle = 2. * M_PI * gsl_rng_uniform(generator);
+        rand_unity_vector[0] = cos(rand_angle);
+        rand_unity_vector[1] = sin(rand_angle);
+
+        Particle test_particle = P[index];
+
+        double esq = 0.;
+        for (int d = 0; d < dim; d++) {
+                test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
+                esq += test_particle.e[d] * test_particle.e[d];
+        }
+
+        double esq_norm = sqrt(esq);
+
+        for (int d = 0; d < dim; d++) {
+                test_particle.e[d] /= esq_norm;
+        }
+
 	Node *current = test_particle.verList->next;
     while (current != NULL) {
 		
@@ -60,8 +63,11 @@ int MetropolisRotation(int index, Particle *P, double L) {
             
 		if (i != index) {
 			double disij = DistanceOverlap(&test_particle, &(P[i]), L);     // See distance.c
-			
-			if(disij < 0.) {
+			double disji = 0.;
+			if (disij < b) {
+				disji = Distance(&(P[i]), &test_particle, L, 0); 
+			}
+			if(disij < 0. || disji < 0.) {
 				
 				return 0;
 			}
@@ -102,8 +108,11 @@ double VolumeMCStep(double L, Particle *P) {
 				if (j < i) {
 				
 					double disij = DistanceOverlap(&(test_particles[i]), &(test_particles[j]), L_temp);     // See distance.c
-					
-					if(disij < 0.) {
+					double disji = 0.;
+					if (disij < b) {				
+						disji = Distance(&(test_particles[j]), &(test_particles[i]), L_temp, 0);     // See distance.c
+					}
+					if(disij < 0. || disji < 0.) {
 						return L;
 					}
 				}

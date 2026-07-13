@@ -10,18 +10,23 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 		for (int j = 0; j < i; j++) {
 			
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
-			
-			double limit = (r_v + 0.5 / sin(M_PI / (double)m) * a);
-			if (lambda > 1.) {
-				limit *= lambda;
-			}
-			
-			if (disij < 0.) {
-				printf("ERROR: Unexpected overlap after step: %d.\n", step);
-				exit(1);
-			} else if(disij < limit) {
-				push(P[i].verList, P[j].verList->value);
-				push(P[j].verList, P[i].verList->value);					
+			if (disij < a + b + r_v) {
+				double disji = DistanceOverlap(&(P[j]), &(P[i]), L);
+				if (disij < 0. || disji < 0.) {
+					printf("ERROR: Unexpected overlap after step: %d.\n", step);
+					exit(1);
+				} else if(disij < (r_v + a) || disji < (r_v + a)) {
+					push(P[i].verList, P[j].verList->value); 
+					push(P[j].verList, P[i].verList->value);
+				}
+			} else {
+				if (disij < 0.) {
+					printf("ERROR: Unexpected overlap after step: %d.\n", step);
+					exit(1);
+				} else if(disij < (r_v + a)) {
+					push(P[i].verList, P[j].verList->value);
+					push(P[j].verList, P[i].verList->value);					
+				}
 			}
 		}
 		
@@ -36,10 +41,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 bool CheckVerlet(Particle *P, double L) {
 	
 	double dissq_max[2] = {0., 0.};
-	double l_half_i = 0.5 / sin(M_PI / (double)m) * a;
-	if (lambda > 1.) {
-		l_half_i *= lambda;
-	}
+	double l_half_i = a;
 	
 	for (int i = 0; i < N; i++) {
 	

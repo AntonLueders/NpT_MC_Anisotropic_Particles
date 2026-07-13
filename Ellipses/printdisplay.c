@@ -16,7 +16,7 @@ void PrintWelcome() {
     printf("+             NpT Monte Carlo simulations of hard convex bodies    "
            "    "
            "      +\n");
-    printf("+             2D Polygon version                                   "
+    printf("+             2D Ellipsoid version                                 "
            "    "
            "      +\n");
     printf("+                                                                  "
@@ -25,7 +25,7 @@ void PrintWelcome() {
     printf("+             Author:   Anton Lueders                              "
            "    "
            "      +\n");
-    printf("+             Date:     27.04.2025                                 "
+    printf("+             Date:     02.02.2025                                 "
            "    "
            "      +\n");
     printf("+                                                                  "
@@ -43,13 +43,13 @@ void PrintWelcome() {
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             Last edited: 27.08.2025                              "
+    printf("+             Last edited: 12.09.2025                              "
            "    "
            "      +\n");
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             V1.0.1                                               "
+    printf("+             V1.2.4                                               "
            "          +\n");
     printf("+                                                                  "
            "    "
@@ -76,13 +76,12 @@ void PrintInput() {
 	printf("sweeps\t%d\n", sweeps);
 	printf("rate\t%d\n", rate);
 	printf("a\t%1.6f\n", a);
+	printf("b\t%1.6f\n", b);
 	printf("seed\t%ld\n", seed);
 	printf("delta\t%1.6f\n", delta);
 	printf("delta_r\t%1.6f\n", delta_r);
 	printf("delta_V\t%1.6f\n", delta_V);
 	printf("r_v\t%1.6f\n", r_v);
-	printf("M\t%d\n", m);
-	printf("lambda\t%1.6f\n", lambda);
 }
 
 // ----------------------------------------------------------------------------------------

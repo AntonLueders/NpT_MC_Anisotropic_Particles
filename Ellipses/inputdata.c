@@ -16,13 +16,12 @@ void PrintInputfile() {
 	fprintf(file, "sweeps\t%d\n", sweeps);
 	fprintf(file, "rate\t%d\n", rate);
 	fprintf(file, "a\t%1.6f\n", a);
+	fprintf(file, "b\t%1.6f\n", b);
 	fprintf(file, "seed\t%ld\n", seed);
 	fprintf(file, "delta\t%1.6f\n", delta);
 	fprintf(file, "delta_r\t%1.6f\n", delta_r);
 	fprintf(file, "delta_V\t%1.6f\n", delta_V);
 	fprintf(file, "r_v\t%1.6f\n", r_v);
-	fprintf(file, "M\t%d\n", m);
-	fprintf(file, "lambda\t%1.6f\n", lambda);
 
     fclose(file);
 }
@@ -52,13 +51,12 @@ void ReadInput() {
 	int sweeps_temp = sweeps;
 	int rate_temp = rate;
 	double a_temp = a;
+	double b_temp = b;
 	long seed_temp = (long)seed;
 	double delta_temp = delta;
 	double delta_r_temp = delta_r;
 	double delta_V_temp = delta_V;
 	double r_v_temp = r_v;
-	int m_temp = m;
-	double lambda_temp = lambda;
 
 	
 	// Reading the inputfile
@@ -98,6 +96,12 @@ void ReadInput() {
         printf("ERROR: Check input or use Setup option. (a)\n");
         exit(1);
     }
+		if (fscanf(input, "%s\t%lf%[^\n]\n", temp, &b_temp, dummy) == 2) {
+        b = b_temp;
+    } else {
+        printf("ERROR: Check input or use Setup option. (b)\n");
+        exit(1);
+    }
     if (fscanf(input, "%s\t%ld%[^\n]\n", temp, &seed_temp, dummy) == 2) {
         seed = (long)seed_temp;
     } else {
@@ -128,18 +132,6 @@ void ReadInput() {
         printf("ERROR: Check input or use Setup option. (r_v)\n");
         exit(1);
     }	
-	if (fscanf(input, "%s\t%d%[^\n]\n", temp, &m_temp, dummy) == 2) {
-        m = m_temp;
-    } else {
-        printf("ERROR: Check input or use Setup option. (m)\n");
-        exit(1);
-    }
-	if (fscanf(input, "%s\t%lf%[^\n]\n", temp, &lambda_temp, dummy) == 2) {
-        lambda = lambda_temp;
-    } else {
-        printf("ERROR: Check input or use Setup option. (lambda)\n");
-        exit(1);
-    }	
 	
 	fclose(input);
 }
@@ -151,10 +143,6 @@ void CheckForConflict() {
         printf("ERROR: Use at least 1 particle.\n");
         exit(1);
     }
-	if (m < 3 || m > 10) {
-		printf("ERROR: Polygone not well defined.\n");
-        exit(1);
-	}
     if (p < 0.) {
         printf("ERROR: Negative pressure is not defined.\n");
         exit(1);
@@ -170,11 +158,20 @@ void CheckForConflict() {
         exit(1);    
     }
     
+    if (a <= b) {
+        printf("ERROR: a must be larger than b.\n");
+        exit(1);
+    }
+    
     if (r_v < 2. * a + 3. * delta) {
         printf("WARNING: Particles can move a larger distance than r_v.\n");
     }
-	if (lambda <= 0.) {
-		printf("ERROR: Lambda must be between 0 and 1.\n");
-        exit(1);   		
+
+    if (a / b > 20. && a / b < 30.) {
+		printf("WARNING: The computations might be unstable for a /b > 20.\n");
+		printf("WARNING: Please use a /b <= 20.\n");
+	} else if (a / b >= 30.) {
+		printf("ERROR: The computations are designed for a / b <= 20.\n");
+        exit(1);  
 	}
 }

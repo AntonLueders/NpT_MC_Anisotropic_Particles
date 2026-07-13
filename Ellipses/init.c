@@ -9,7 +9,7 @@ void InitRandom(Particle *P, double L) {
     for (int i = 0; i < N; i++) {   
 		
 		if(counter_overlap > (long)N * (long)N) {
-            printf("ERROR: System too dense. (%d)\n", i);
+            printf("ERROR: System too dense.\n");
             exit(1);
         }
 		
@@ -18,6 +18,8 @@ void InitRandom(Particle *P, double L) {
             P[i].e_old[d] = 0.;
         }
 		P[i].a = a;
+		P[i].b = b;
+		P[i].ecc = sqrt(1. - b * b / (a * a));
 		
 		double esq = 0.;
 		
@@ -35,18 +37,22 @@ void InitRandom(Particle *P, double L) {
 		for (int j = 0; j < i; j++) {
             
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
-            if(disij < 0.) {
+			double disji = 0.;
+			if (disij <= b) {
+				disji = DistanceOverlap(&(P[j]), &(P[i]), L);
+			}
+            if(disij < 0. || disji < 0.) {
                 i--;
                 counter_overlap++;
                 break;
             }
-        }         
+        }         	
 	}
 	
-	for (int i = 0; i < N; i++) {
+	for(int i = 0; i < N; i++) {
 		P[i].verList = malloc(sizeof(Node));
         P[i].verList->value = i;
-        P[i].verList->next = NULL;	
+        P[i].verList->next = NULL;
 	}
 	
 	printf("Init. successful.\n");

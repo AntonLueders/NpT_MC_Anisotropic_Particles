@@ -2,14 +2,6 @@
 
 // ----------------------------------------------------------------------------------------
 
-void RotationMatrix(double *old, double angle, double *newV) {
-	
-	double *old_temp = old;
-	
-	newV[0] = old_temp[0] * cos(angle) - old_temp[1] * sin(angle);
-	newV[1] = old_temp[0] * sin(angle) + old_temp[1] * cos(angle);
-}
-
 // Periodic boundary conditions (for position)
 inline double PeriodicPos(double dr, double L) {
 
@@ -38,12 +30,8 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	}
 	
 	double disij = 0.;
-	double limit = 1.05 / sin(M_PI / (double)m) * a;
-	if(lambda > 1.) {
-		limit *= lambda;
-	}
-	if (sqrt(rijsq) < limit) {
-		disij = Distance(p_i, p_j, L);
+	if (sqrt(rijsq) < 2.05 * a) {
+		disij = Distance(p_i, p_j, L, 0);
 	} else {
 		disij = sqrt(rijsq);
 	}
@@ -51,227 +39,180 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	return disij;
 }
 
-
-// ----------------------------------------------------------------------------------------
-
-double DistancePointLine(double *r, double *corner, double *direction, double length, double *dij) {
+double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
-	double position[dim];
-	double parameter = 0.;
+	double a1 = p_i->a;
+	double b1 = p_i->b;
+	double ecc1 = p_i->ecc;
 	
-	for (int d = 0; d < dim; d++) {
-		position[d] = r[d] - corner[d];
-		parameter += position[d] * direction[d] / length;
-	}
+	double b2 = p_j->b;
+	double ecc2 = p_j->ecc;
 	
-	double point_on_line[dim];
-	
-	if (parameter < 0.) {
-		for (int d = 0; d < dim; d++) {
-			point_on_line[d] = corner[d];
-		}
-	} else if (parameter > 1.) {
-		for (int d = 0; d < dim; d++) {
-			point_on_line[d] = corner[d] + length * direction[d];
-		}
-	} else {
-		for (int d = 0; d < dim; d++) {
-			point_on_line[d] = corner[d] + parameter * length * direction[d];
-		}
-	}
-	
-	double dijsq = 0.;
-	
-	for (int d = 0; d < dim; d++) {
-		dij[d] = point_on_line[d] - r[d];
-		dijsq += dij[d] * dij[d];
-	}
-	
-	return sqrt(dijsq);
-}
-
-void ProjectSAT(double ri[][dim], double *axis, double *min, double *max) {
-	
-	*min = 0.;
-	for(int d = 0; d < dim; d++) {
-		*min += ri[0][d] * axis[d];
-	}
-	*max = *min;
-	
-	
-	for(int k = 1; k < m; k++) {
-		double scalar = 0.;
-		for(int d = 0; d < dim; d++) {
-			scalar += ri[k][d] * axis[d];
-		}
-		if (scalar < *min) {
-			*min = scalar;
-		}
-		if (scalar > *max) {
-			*max = scalar;
-		}
-	}
-}
-
-int CheckOverlapSAT(double ri[][dim], double rj[][dim], double directionsi[][dim], double directionj[][dim]) {
-	
-	double mini = 0.;
-	double maxi = 0.;
-	double minj = 0.;
-	double maxj = 0.;
-	for(int k = 0; k < m; k++) {
-		double axis[2] = {-directionsi[k][1], directionsi[k][0]};
-		ProjectSAT(ri, axis, &mini, &maxi);
-		ProjectSAT(rj, axis, &minj, &maxj);
-		if ((maxi < minj) || (maxj < mini)) {
-			return 0;
-		}
-	}
-	
-	for(int k = 0; k < m; k++) {
-		double axis[2] = {-directionj[k][1], directionj[k][0]};
-		ProjectSAT(ri, axis, &mini, &maxi);
-		ProjectSAT(rj, axis, &minj, &maxj);
-		if ((maxi < minj) || (maxj < mini)) {
-			return 0;
-		}
-	}
-	
-	return 1;
-}
-
-void Compress(double ri[][dim], double *e) {
-
-	double ri_temp[m][dim];
-	double e_perp[2] = {-e[1], e[0]};
-	
-	for(int k = 0; k < m; k++) {
-		
-		double ri_m_e = 0.;
-		double ri_m_e_perp = 0.;
-		for (int d = 0; d < dim; d++) {
-			ri_m_e += ri[k][d] * e[d];
-			ri_m_e_perp += ri[k][d] * e_perp[d];
-		}
-		
-		for (int d = 0; d < dim; d++) {
-			ri_temp[k][d] = ri_m_e * e[d] * lambda + ri_m_e_perp * e_perp[d];
-		}
-	}
-	
-	for(int k = 0; k < m; k++) {
-		for(int d = 0; d < dim; d++) {
-			ri[k][d] = ri_temp[k][d];
-		}
-	}
-}
-
-double Distanceij(double ri[][dim], double cornerj[][dim], double directionj[][dim], double *length) {
-	
-	double r_temp[dim];
-	double corner_temp[dim];
-	double direction_temp[dim];
-	double length_temp = 0.;
-	double dis_temp = 0.;
-	double dij_temp[dim];
-	double dis = 0.;
-	
-	for (int k = 0; k < m; k++) {
-		for (int h = 0; h < m; h++) {
-			for(int d = 0; d < dim; d++) {
-				r_temp[d] = ri[k][d];
-				corner_temp[d] = cornerj[h][d];
-				direction_temp[d] = directionj[h][d];
-				length_temp = length[h];
-			}
-			
-			dis_temp = DistancePointLine(r_temp, corner_temp, direction_temp, length_temp, dij_temp);
-			if (k == 0 && h == 0) {
-				dis = fabs(dis_temp);
-			}
-			
-			if (dis_temp < dis) {
-				dis = fabs(dis_temp);
-			}
-		}		
-	}
-	
-	return dis;
-}
-
-double Distance(Particle *p_i, Particle *p_j, double L) {
+	double eta = a1 / b1 - 1.;
 	
 	double rij[dim];
+	double rijsq = 0.;
+	
 	for (int d = 0; d < dim; d++) {
 		rij[d] = PeriodicDis(p_j->r[d] - p_i->r[d], L);
+		rijsq += rij[d] * rij[d];
 	}
 	
-	double ri[m][dim];	
-	double cornerj[m][dim];
-	double directioni[m][dim];
-	double directionj[m][dim];
-	double length = 0.5 / sin(M_PI / (double)m) * a;
-	double length_k[m];
-	
-	double vector_to_corner_i[m][dim];
-	double vector_to_corner_j[m][dim];
+	double rij_hat[dim];
+	double rij_norm = sqrt(rijsq);
 	
 	for (int d = 0; d < dim; d++) {
-		vector_to_corner_i[0][d] = length * p_i->e[d];
-		vector_to_corner_j[0][d] = length * p_j->e[d];
+		
+		rij_hat[d] = rij[d] / rij_norm;
 	}
 	
-	for (int i = 1; i < m; i++) {
-		RotationMatrix(vector_to_corner_i[i - 1], 2. * M_PI / (double)m, vector_to_corner_i[i]);
-		RotationMatrix(vector_to_corner_j[i - 1], 2. * M_PI / (double)m, vector_to_corner_j[i]);
+	double eiej = 0.;	
+	double rij_hatei = 0.;
+	double rij_hatej = 0.;
+	
+	for (int d = 0; d < dim; d++) {
+		
+		rij_hatei += rij_hat[d] * p_i->e[d];
+		rij_hatej += rij_hat[d] * p_j->e[d];
+		eiej += p_i->e[d] * p_j->e[d];
 	}
 	
-	if(m % 2 != 0) {	
-		Compress(vector_to_corner_i, p_i->e);
-		Compress(vector_to_corner_j, p_j->e);
-	} else {
-		double e_perp_i[2] = {-p_i->e[1], p_i->e[0]};
-		double e_perp_j[2] = {-p_j->e[1], p_j->e[0]};
-		Compress(vector_to_corner_i, e_perp_i);
-		Compress(vector_to_corner_j, e_perp_j);
-	}
-	
-	for (int k = 0; k < m; k++) {                  
-		for (int d = 0; d < dim; d++) {
-			ri[k][d] = p_i->r[d] + vector_to_corner_i[k][d];
-			cornerj[k][d] = p_i->r[d] + rij[d] + vector_to_corner_j[k][d];
+	double check_para = 1.0 - eiej * eiej;
+	if (check_para  < 1e-10) {
+		
+		if (eiej / fabs(eiej) < 0.) {
+			eiej = - eiej;
+			rij_hatej = - rij_hatej;
 		}
 	}	
-			
-	for(int k = 0; k < m; k++) {
-		int kp1 = k + 1;
-		if (kp1 == m) {
-			kp1 = 0;
-		}
-		double length_k_temp = 0.;
-		for (int d = 0; d < dim; d++) {
-			directioni[k][d] = ri[kp1][d] - ri[k][d];
-			directionj[k][d] = cornerj[kp1][d] - cornerj[k][d];
-			length_k_temp += directioni[k][d] * directioni[k][d];
-		}
-		for (int d = 0; d < dim; d++) {
-			directioni[k][d] /= sqrt(length_k_temp);
-			directionj[k][d] /= sqrt(length_k_temp);
-			length_k[k] = sqrt(length_k_temp);
-		}
-	}
 	
-	int checkOverlap = CheckOverlapSAT(ri, cornerj, directioni, directionj);
-	if (checkOverlap == 1) {		
-		return -1.;
-	}
+	double d = 0.;
 	
-	double dis1 = Distanceij(ri, cornerj, directionj, length_k);
-	double dis2 = Distanceij(cornerj, ri, directioni, length_k);
+	double ratio_bsq = b1 * b1 / (b2 * b2);
+	double one_plus_eiej = (1. + eiej);
+	double one_minus_eiej = (1. - eiej);
+	double ecc1_sq = ecc1 * ecc1;
+	double ecc2_sq = ecc2 * ecc2;
+	double eiej_sq = eiej * eiej;
+	double rij_hat_ei_sq = rij_hatei * rij_hatei;
+	double b1_div_a1 = b1 / a1;
+	double rij_hat_eiej = rij_hatei * eiej;
+	double etaeiej = eta * eiej;
+	double eta_two_plus_eta = eta * (2. + eta);
 	
-	if (dis1 < dis2) {
-		return dis1;
+	double A11 = ratio_bsq * ( 1. + 0.5 * one_plus_eiej * (eta_two_plus_eta - ecc2_sq * (1. + etaeiej) * (1. + etaeiej)));
+	double A22 = ratio_bsq * ( 1. + 0.5 * one_minus_eiej * (eta_two_plus_eta - ecc2_sq * (1. - etaeiej) * (1. - etaeiej)));
+	double temp_argument_A12 = check_para;
+	if (temp_argument_A12 < 0.) {
+		temp_argument_A12 = 0.;
+	}	
+	double A12 = ratio_bsq * 0.5 * sqrt(temp_argument_A12) * (eta * (2. + eta) + ecc2_sq * (1. - eta * eta * eiej_sq));
+	
+	double A12_sq = A12 * A12;
+	
+	double ev_part_1 = 0.5 * (A11 + A22);
+	double ev_part_2 = sqrt(0.25 * (A11 - A22) * (A11 - A22) + A12_sq);
+	
+	double lambda_p = ev_part_1 + ev_part_2;
+	double lambda_m = ev_part_1 - ev_part_2;
+	
+	double e_p_primed_prime = 0.;
+	
+	if (check_para  < 1e-10) {
+		
+		if (A11 >= A22) {			
+			e_p_primed_prime = 1. / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1_div_a1 * rij_hatei;
+		} else if (A22 < A11) {
+			double temp_argument_e_p_primed_prime = 1. - rij_hat_ei_sq;
+			if (temp_argument_e_p_primed_prime < 0.) {
+				temp_argument_e_p_primed_prime = 0.;
+			}
+			e_p_primed_prime = sqrt(temp_argument_e_p_primed_prime) / (sqrt(1. - ecc1_sq * rij_hat_ei_sq));
+		}
 	} else {
-		return dis2;
+		
+		double lambda_m_A11 = lambda_p - A11;
+		
+		double factor = 1. / (sqrt(2.) * sqrt(A12_sq + lambda_m_A11 * lambda_m_A11) * sqrt(1. - ecc1_sq * rij_hat_ei_sq));
+		double term1 = A12 / (sqrt(one_plus_eiej)) * (b1_div_a1 * rij_hatei + rij_hatej + (b1_div_a1 - 1.) * rij_hat_eiej);
+		double term2 = (lambda_p - A11) / (sqrt(one_minus_eiej)) * (b1_div_a1 * rij_hatei - rij_hatej - (b1_div_a1 - 1.) * rij_hat_eiej);
+		
+		e_p_primed_prime = factor * (term1 + term2);
 	}
+	
+	double a2_prime = 1. / sqrt(lambda_m);
+	double b2_prime = 1. / sqrt(lambda_p);
+	
+	double delta_dis = a2_prime * a2_prime / (b2_prime * b2_prime) - 1.;
+	
+	double one_plus_delta = (1. + delta_dis);
+	
+	double d_prime = 0.;
+	
+	if (fabs(e_p_primed_prime) < 1e-8 || fabs(delta_dis) < 1e-8) {
+		
+		d_prime = 1. + a2_prime;
+	} else if (fabs(fabs(e_p_primed_prime) - 1.) < 1e-8 && state == 0) { 
+		return Distance(p_j, p_i, L, 1);
+	} else {
+		
+		double tanphisq = 1. / (e_p_primed_prime * e_p_primed_prime) - 1.;
+		
+		double iv_b2_prime = 1. / b2_prime;
+		double iv_b2_prime_sq = 1. / (b2_prime * b2_prime);
+		double one_plus_tan_plus_delta = (1. + tanphisq + delta_dis);
+		double one_plus_tan = (1. + tanphisq);
+		
+		double A = - iv_b2_prime_sq * one_plus_tan;
+		double B = - 2. * iv_b2_prime * one_plus_tan_plus_delta;
+		double C = - tanphisq - one_plus_delta * one_plus_delta + iv_b2_prime_sq * (1. + one_plus_delta * tanphisq);
+		double D = 2. * iv_b2_prime * one_plus_tan * one_plus_delta;
+		double E = one_plus_tan_plus_delta * one_plus_delta;
+		
+		double A_sq = A * A;
+		double B_sq = B * B;
+		
+		double alpha = - 3. * B_sq/ (8. * A_sq) + C / A;
+		double beta = B * B_sq / (8. * A * A_sq) - B * C / (2. * A_sq) + D / A;
+		double gamma = -3. * B_sq * B_sq / (256. * A_sq * A_sq) + C * B_sq / (16. * A * A_sq) - B * D / (4. * A_sq) + E / A;
+		
+		double alpha_sq = alpha * alpha;
+		
+		double q = 0.;
+		if (fabs(beta) > 1e-8) {				
+			
+			double P = - alpha_sq / 12. - gamma;
+			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
+			double temp_argument_Q = Q * Q / 4. + P * P * P /27.;
+			if(fabs(temp_argument_Q) < 1e-8 && temp_argument_Q < 0) {
+				temp_argument_Q = - temp_argument_Q;
+			}
+			double U = cbrt(- Q / 2. + sqrt(temp_argument_Q));
+			
+			double y = 0.;
+			if (fabs(U) > 1e-8) {
+				y = - 5. / 6. * alpha + U - P / (3. * U);
+			} else {
+				y = - 5. / 6. * alpha - cbrt(Q);
+			}
+			q = - B / (4. * A) + 0.5 * (sqrt(alpha + 2. * y) + sqrt(-(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha + 2. * y)))));
+		} else {
+			q = - B / (4. * A) + sqrt(0.5 * (- alpha + sqrt(alpha_sq - 4. * gamma)));
+		}
+		
+		double first_pow = 1. + (b2_prime * one_plus_delta) / q;
+		double second_pow = 1. + b2_prime / q;
+		double qsq_minus_one = (q * q - 1.);
+		
+		d_prime = sqrt(qsq_minus_one / delta_dis * first_pow * first_pow + (1. - qsq_minus_one / delta_dis) * second_pow * second_pow);
+	}
+	
+	d = d_prime / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1;
+	
+	if(isnan(d) || isinf(d)) {
+		printf("ERROR: Unexpected result while computing the distance.");
+		exit(1);
+	}
+	
+	return rij_norm - d;
 }
