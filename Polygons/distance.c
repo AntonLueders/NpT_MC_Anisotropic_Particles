@@ -154,7 +154,7 @@ int CheckOverlapSAT(double ri[][dim], double rj[][dim], double directionsi[][dim
 
 // ----------------------------------------------------------------------------------------
 
-// Deforms the polygon shapes by scaling on direction byb lambda
+// Deforms the polygon shapes by scaling on direction by lambda
 void Compress(double ri[][dim], double *e) {
 
 	double ri_temp[m][dim];
@@ -184,7 +184,7 @@ void Compress(double ri[][dim], double *e) {
 // ----------------------------------------------------------------------------------------
 
 // Estimates a distance between the two polygons. This function is not important for 
-// calculating the overlap
+// calculating the overlap. It is used for the Verlet-lists.
 double Distanceij(double ri[][dim], double cornerj[][dim], double directionj[][dim], double *length) {
 	
 	double r_temp[dim];
