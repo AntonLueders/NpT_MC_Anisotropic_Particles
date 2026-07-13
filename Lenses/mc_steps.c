@@ -1,6 +1,11 @@
 #include "mc_steps.h"
 #include "distance.h"
 
+// ----------------------------------------------------------------------------------------
+
+// Translational random step: It creats a test particles with the properties of
+// the chosen particle. Then it displace this test particle randomly. 
+// If the test particle does not overlap with another one, the step is accepted.
 int MetropolisTranslation(int index, Particle *P, double L) {
 	
 	Particle test_particle = P[index];
@@ -31,6 +36,11 @@ int MetropolisTranslation(int index, Particle *P, double L) {
 	return 1;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Rotational random step: It creats a test particles with the properties of
+// the chosen particle. Then it rotates this test particle randomly. 
+// If the test particle does not overlap with another one, the step is accepted.
 int MetropolisRotation(int index, Particle *P, double L) {
 	
 	double rand_unity_vector[dim];
@@ -76,6 +86,9 @@ int MetropolisRotation(int index, Particle *P, double L) {
 	return 1;
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Random volume step for the implementation of the NpT ensemble
 double VolumeMCStep(double L, Particle *P) {
 	
 	double V = pow(L, (double)dim);
@@ -131,3 +144,5 @@ double VolumeMCStep(double L, Particle *P) {
 		return L; 
 	}
 }
+
+// ----------------------------------------------------------------------------------------
