@@ -22,6 +22,8 @@ inline double PeriodicDis(double dr, double L) {
 
 // ----------------------------------------------------------------------------------------
 
+// This is the first function which is used to check if the particles are even close enouth
+// that checks for overlap are necessary.
 double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijsq = 0.;
@@ -39,7 +41,6 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	return disij;
 }
 
-
 // ----------------------------------------------------------------------------------------
 
 double Sign(double value, double sign) {
@@ -50,6 +51,10 @@ double Sign(double value, double sign) {
 	return value * sign / fabs(sign);
 }
 
+// ----------------------------------------------------------------------------------------
+
+// Distance between spherocylinders as implemented in the program written for
+// SIEMS, Ullrich, 2017. Computersimulationen von Modell-Kolloiden in Kanälen [Dissertation]. Konstanz: Universität Konstanz
 double Distance(Particle *p_i, Particle *p_j, double L) {
 	
 	double rijei = 0.;
@@ -108,3 +113,5 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 	
 	return sqrt(dissq);
 }
+
+// ----------------------------------------------------------------------------------------
