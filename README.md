@@ -10,6 +10,7 @@ The corresponding folders contain individual programs for the different hard con
  - [ Requirements and how to build the executables](#Requirements)
  - [How to use the MC programs](#Use)
  - [How to interprete the generated data](#Data)
+ - [Contents of the particular files](#Contents)
  - [Disclaimer](#Disclaimer)
  - [Cite this software](#Cite)
 
@@ -75,6 +76,23 @@ All simulation programs in this repository output a single data file:
 - *Position_For_Ovito.xyz:* This file stores the particle configurations. Every "rate" MC sweeps, the center coordinates are stored in this file. The last column of the data file contains the current total area of the simulation box, which is needed to calculate the average particle density.
 
 To visualize the configurations of the system, it is suggested to use external software that can interpret the xyz position files. For this, *VMD* [Humphrey et al. J. Mol. Graph. 1996] or *OVITO* [https://www.ovito.org/] can be used.
+
+ <a id="Contents"></a>
+# Contents of the particular files
+
+The different programs consists of multiple C files. Here, a summary of the corresponding content of the particular files is given.
+
+- **NpT_2D_xxx.c:** Main file which contains the simulation loop. It calls functions grouped in the other files.
+- **distance.c:** Contains functions to check for overlap between particles and calculate distances. In particular, it contains the functions which implement the particle shape.
+- **init.c:** Initialization of the system at the start of the simulation is organized in init.c.
+- **inputdata.c:** All functions in the context of the input parameters are given here.
+- **lists.c:** BDHM uses linked lists as a data structure. Here, the corresponding functions are implemented.
+- **mc_steps.c:** This file contains the translational, rotational, and volume MC steps. 
+- **printdata.c:** Here, the functions that write the output data are summarized.
+- **printdisplay.c:** This file contains the text that is written to the console.
+- **verletlist.c:** In verletlist.c, the functions to check if the Verlet lists must be updated are implemented. Verlet lists are a method to reduce the computation time of the simulations.
+
+To understand how the particular simulation is working, it is suggested to start by reading the main simulation loop in the main *C* file **NpT_2D_xxx.c**. If details for the specific function used in the main loop are needed, it is then possible to navigate to the correct subfile that contains the source code of the specific commands. Also, if there are questions regarding individual parameters that are used through all functions in the various *C* files, it is always suggested to go back to the main file and check the global variables.
 
  <a id="Disclaimer"></a>
 # Disclaimer
