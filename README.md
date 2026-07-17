@@ -4,7 +4,7 @@ This repository contains the NpT MC simulation software used to obtain the data 
 
 [1] Lüders, A., Franosch, T., and Schilling, R. *How the number of vertices determines the thermodynamics of fluids of hard polygons*.
 
-The different folders contain individual programs for the different hard convex particles. All information and methods employed are described in detail in the supporting information of [1]. While the programs can be used to repeat the corresponding simulations, we strongly encourage a full independent reproduction using the information in the supplemental information.
+The corresponding folders contain individual programs for the different hard convex particles. All information and methods employed are described in detail in the supporting information of [1]. While the programs can be used to repeat the corresponding simulations, we strongly encourage a full independent reproduction using the information in the supplemental information.
 
 # Table of contents:
  - [ Requirements and how to build the executables](#Requirements)
