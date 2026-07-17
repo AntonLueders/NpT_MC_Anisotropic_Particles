@@ -15,7 +15,7 @@ The different folders contain individual programs for the different hard convex 
  <a id="Requirements"></a>
 # Requirements and how to build the executables
 
-The program is written in *C* (C99 standard) and it can successfully be built with gcc. To compile BDHM, the library GSL must be linked. 
+The program is written in *C* (C99 standard) and it can successfully be built with gcc. The simulations presented in [1] were performed using binaries build with *gcc version 4.8.5* and *gcc version 7.5.0*. To compile BDHM, the library GSL must be linked. 
 
 The source files of the different programs can be found in the correspondings folders in this repository. An example makefiles are given. As usual, it can be used to compile the program by typing 
 
