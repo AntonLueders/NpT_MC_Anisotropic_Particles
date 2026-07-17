@@ -57,7 +57,10 @@ The particular lines of such an input file and the meaning of the numbers are su
 - **T:** Temperature (the program is only tested for the case where this value is set to unity)
 - **sweeps:** Number of MC sweeps (i.e., steps per particle)
 - **rate:** The particle configuration is saved every "rate" sweeps.
-- **a:** Length scale of the particles. For polygons, this is the distance between the center and the vertices for the regular reference body before deformation. For ellipses, this is the larger semi-axis.
+- **a:** Length scale of the particles. For eggs, this is the semi-axis for the elliptical end. For ellipses, this is the larger semi-axis. For lenses, this is half of the particle length. For polygons, this is the side length for the regular reference body before deformation. For rhombi, this is the larger diagonal.
+- **b:** Second length scale of the particles. For eggs, this is the radius of the circular end. For ellipses, this is the smaller semi-axis. For lenses, this is half of the particle width. For rhombi, this is the smaller diagonal.
+- **q:** Aspect ratio.
+- **sigma:** Particle width.
 - **seed:** Random seed.
 - **delta:** Displacement for translational random moves.
 - **delta_r:** Displacements for rotational random moves.
