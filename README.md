@@ -9,6 +9,7 @@ The different folders contain individual programs for the different hard convex 
 # Table of contents:
  - [ Requirements and how to build the executables](#Requirements)
  - [How to use the MC programs](#Use)
+ - [How to interprete the generated data](#Data)
  - [Disclaimer](#Disclaimer)
  - [Cite this software](#Cite)
 
@@ -65,6 +66,15 @@ The particular lines of such an input file and the meaning of the numbers are su
 - **lambda:** Scaling factor used to deform the regular polygons.
 
 Note that the word and number separation in the input file should be done with the **tab key** (the program is only tested for this case).  
+
+ <a id="Data"></a>
+# How to interprete the generated data
+
+All simulation programs in this repository output a single data file:
+
+- *Position_For_Ovito.xyz:* This file stores the particle configurations. Every "rate" MC sweeps, the center coordinates are stored in this file. The last column of the data file contains the current total area of the simulation box, which is needed to calculate the average particle density.
+
+To visualize the configurations of the system, it is suggested to use external software that can interpret the xyz position files. For this, *VMD* [Humphrey et al. J. Mol. Graph. 1996] or *OVITO* [https://www.ovito.org/] can be used.
 
  <a id="Disclaimer"></a>
 # Disclaimer
