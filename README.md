@@ -69,7 +69,7 @@ The particular lines of such an input file and the meaning of the numbers are su
 - **m:** Number of vertices.
 - **lambda:** Scaling factor used to deform the regular polygons.
 
-Note that the word and number separation in the input file should be done with the **tab key** (the program is only tested for this case).  
+Note that the word and number separation in the input file should be done with the **tab key** (the program is only tested for this case). The structure of the inputfile of the various shapes is different.
 
  <a id="Data"></a>
 # How to interprete the generated data
