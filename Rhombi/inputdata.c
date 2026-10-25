@@ -161,7 +161,7 @@ void CheckForConflict() {
     }
     
     if (a < b) {
-        printf("ERROR: a describes the larger edge 1.\n");
+        printf("ERROR: a describes the larger edge 1/diagonal.\n");
         exit(1);
     }
     
