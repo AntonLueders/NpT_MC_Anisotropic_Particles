@@ -37,19 +37,19 @@ void PrintWelcome() {
     printf("+             BioNano-Physics                                      "
            "    "
            "      +\n");
-    printf("+             Univesity of Innsbruck                               "
+    printf("+             University of Innsbruck                               "
            "    "
            "      +\n");
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             Last edited: 13.07.2026                              "
+    printf("+             Last edited: 25.10.2026                              "
            "    "
            "      +\n");
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             V1.0.3                                               "
+    printf("+             V1.0.4                                               "
            "          +\n");
     printf("+                                                                  "
            "    "
