@@ -49,7 +49,7 @@ void PrintWelcome() {
     printf("+                                                                  "
            "    "
            "      +\n");
-    printf("+             V1.1.2                                               "
+    printf("+             V1.1.0                                               "
            "          +\n");
     printf("+                                                                  "
            "    "
