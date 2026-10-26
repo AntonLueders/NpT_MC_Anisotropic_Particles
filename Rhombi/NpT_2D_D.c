@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
     }
 
 	// Setup 
-	ReadInput(); // see inputdata.c
-	PrintInput(); // see printdisplay.c
-	CheckForConflict(); // see inputdata.c
+	ReadInput(); // See inputdata.c
+	PrintInput(); // See printdisplay.c
+	CheckForConflict(); // See inputdata.c
 
 	// Sets initial system area. V_init_min is chosen through tests and can be varied if needed.
 	double V = (double)N * T / p;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     gsl_rng_set(generator, seed);
 
 	// Initializes particle positions and particle orientations randomly
-	InitRandom(P, L); // see init.c
+	InitRandom(P, L); // See init.c
 	
 	double acc_rate[10][3];
 	long counter_verlet = 1;
