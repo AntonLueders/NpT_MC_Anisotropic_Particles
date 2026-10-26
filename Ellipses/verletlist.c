@@ -17,7 +17,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 				if (disij < 0. || disji < 0.) {
 					printf("ERROR: Unexpected overlap after step: %d.\n", step);
 					exit(1);
-				} else if(disij < (r_v + a) || disji < (r_v + a)) {
+				} else if(disij < (r_v + a) || disji < (r_v + a)) { // Second term is a buffer
 					push(P[i].verList, P[j].verList->value); 
 					push(P[j].verList, P[i].verList->value);
 				}
