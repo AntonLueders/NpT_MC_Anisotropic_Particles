@@ -35,7 +35,7 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	if (sqrt(rijsq) < 1.05 * q * sigma) {
 		disij = Distance(p_i, p_j, L);
 	} else {
-		disij = sqrt(rijsq);
+		disij = sqrt(rijsq) - q * sigma;
 	}
 	
 	return disij;
