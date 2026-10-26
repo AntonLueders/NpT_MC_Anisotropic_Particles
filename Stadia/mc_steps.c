@@ -75,7 +75,7 @@ int MetropolisRotation(int index, Particle *P, double L) {
 			double disij = DistanceOverlap(&test_particle, &(P[i]), L);     // See distance.c
 			double disji = L;
 			if (disij < 3. / 2. * sigma) {
-				disji = Distance(&(P[i]), &test_particle, L); 
+				disji = Distance(&(P[i]), &test_particle, L);	// See distance.c
 			}
 			if(disij < sigma || disji < sigma) {
 				
