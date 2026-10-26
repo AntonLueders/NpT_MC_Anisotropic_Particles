@@ -13,7 +13,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 			
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
 			
-			double limit = (r_v + 0.5 / sin(M_PI / (double)m) * a);
+			double limit = (r_v + 0.25 / sin(M_PI / (double)m) * a);		// The second term is just a buffer.
 			if (lambda > 1.) {
 				limit *= lambda;
 			}
