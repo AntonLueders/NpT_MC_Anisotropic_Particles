@@ -176,7 +176,7 @@ void CheckForConflict() {
         printf("WARNING: Particles can move a larger distance than r_v.\n");
     }
 	if (lambda <= 0.) {
-		printf("ERROR: Lambda must be between 0 and 1.\n");
+		printf("ERROR: Lambda must be positive.\n");
         exit(1);   		
 	}
 }
