@@ -44,7 +44,7 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	
 	double disij = 0.;
 	double limit = 1.05 / sin(M_PI / (double)m) * a;
-	double buffer = sin(M_PI / (double)m) * a;
+	double buffer = 1. / sin(M_PI / (double)m) * a;
 	if(lambda > 1.) {
 		limit *= lambda;
 		buffer *= lambda;
