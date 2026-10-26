@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 			// Volume step
 			if (gsl_rng_uniform(generator) < 1. / (double)(N)) {
 				double L_temp = L;
-				L = VolumeMCStep(L, P);	/ See mc_steps.c
+				L = VolumeMCStep(L, P);	// See mc_steps.c
 				if(fabs(L_temp/L - 1.) > 1e-10) {
 					counter_acc_volume++;
 				}
