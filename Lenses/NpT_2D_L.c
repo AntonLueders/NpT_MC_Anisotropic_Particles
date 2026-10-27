@@ -12,20 +12,20 @@
 // ----------------------------------------------------------------------------------------    
 
 gsl_rng *generator = NULL;                                  // Random number generator
-int dim = DIM;
-int N = NP;
-double p = PRESSURE;
-double T = TEMP;
-int sweeps = SWEEPS;
-int rate = RATE;
-double a = AA;
-double b = BB;
-long seed = SEED;
-double delta = DELTA;
-double delta_r = DELTAR;
-double delta_V = DELTAV;
-double r_v = RV;
-double R = 0.;
+int dim = DIM;												// Dimension of the system. Should be fixed to 2
+int N = NP;													// Number of particles
+double p = PRESSURE;										// Pressure (set by user)
+double T = TEMP;											// Temperature (should be set to 1, not tested otherwise)
+int sweeps = SWEEPS;										// Speeps or MC steps
+int rate = RATE;											// Rate which dictates when data is written
+double a = AA;												// Longer semi-axis
+double b = BB;												// Shorter semi-axis
+long seed = SEED;											// Random seed
+double delta = DELTA;										// Displacement translation
+double delta_r = DELTAR;									// Displacement rotation
+double delta_V = DELTAV;									// Displacement volume
+double r_v = RV;											// Radius for Verlet lists
+double R = 0.;												// Radius of the circles that are the basis for the outline of the lenses
 
 // ----------------------------------------------------------------------------------------
 // Main
@@ -57,13 +57,13 @@ int main(int argc, char *argv[]) {
     }
 
 	// Setup 
-	ReadInput();
+	ReadInput();	// See inputdata.c
 	// Radius of the spheres that form the lense
 	R = (4. * b * b + 4. * a * a) / (8. * b);	
-	PrintInput();
-	CheckForConflict();
+	PrintInput();	// See printdisplay.c
+	CheckForConflict();	// See inputdata.c
 
-	// Sets initial system area
+	// Sets initial system area. V_init_min is chosen through tests and can be varied if needed.
 	double V = (double)N * T / p;
 	double V_init_min = 6.0 * (double)N * T / 3.;
 	if (V < V_init_min) {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     gsl_rng_set(generator, seed);
 
 	// Initializes particle positions and particle orientations randomly
-	InitRandom(P, L);
+	InitRandom(P, L);	// See init.c
 	
 	double acc_rate[10][3];
 	long counter_verlet = 1;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 	FILE *position_file_ovito = NULL;
     position_file_ovito = fopen("Position_For_Ovito.xyz", "w");
 	
-	GenerateVerletLists(P, L, 0);
+	GenerateVerletLists(P, L, 0);	// See verletlist.c
 
 // ---------------------------------------------------------------------------------------- 
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 			// Choses particle
 			int index = (int)gsl_rng_uniform_int(generator, (unsigned long int)N);	
 
-			// MC step
+			// MC step; see mc_steps.c
 			if (gsl_rng_uniform(generator) < 0.5) {
 				counter_acc_translation += MetropolisTranslation(index, P, L);
 			} else {				
@@ -116,14 +116,14 @@ int main(int argc, char *argv[]) {
 			// Volume step
 			if (gsl_rng_uniform(generator) < 1. / (double)(N)) {
 				double L_temp = L;
-				L = VolumeMCStep(L, P);
+				L = VolumeMCStep(L, P);	// See mc_steps.c
 				if(fabs(L_temp/L - 1.) > 1e-10) {
 					counter_acc_volume++;
 				}
 			}
 		}
 
-		// Verlet-lists
+		// Verlet-lists; see verletlists.c
 		if(CheckVerlet(P, L)) {
 			GenerateVerletLists(P, L, step);
 			counter_verlet++;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 			counter_store_current_rate++;
 		}
 
-		// Prints position files
+		// Prints position files; see printdata.c
 		if ((step + 1) % rate == 0) {
 			PrintOvito(position_file_ovito, P, step, L);
 		}
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 	
 	gsl_rng_free(generator);
 	fclose(position_file_ovito);
-	FreeVerLists(P);
+	FreeVerLists(P); // See verletlists.c
 	
 	// Obtains the calendar time at the end of the simulation.
     time_t now;
