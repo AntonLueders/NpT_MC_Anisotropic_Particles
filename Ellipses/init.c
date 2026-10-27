@@ -24,8 +24,6 @@ void InitRandom(Particle *P, double L) {
 		P[i].b = b;
 		P[i].ecc = sqrt(1. - b * b / (a * a));
 		
-		double esq = 0.;
-		
         for (int d = 0; d < dim; d++) {
                 
             P[i].r[d] = L * gsl_rng_uniform(generator);
