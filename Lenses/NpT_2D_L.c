@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 	// Setup 
 	ReadInput();	// See inputdata.c
 	// Radius of the spheres that form the lense
-	R = (4. * b * b + 4. * a * a) / (8. * b);	
+	R = (b * b + a * a) / (2. * b);	
 	PrintInput();	// See printdisplay.c
 	CheckForConflict();	// See inputdata.c
 
