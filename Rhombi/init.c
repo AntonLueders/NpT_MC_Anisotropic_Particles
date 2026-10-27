@@ -23,8 +23,6 @@ void InitRandom(Particle *P, double L) {
 		P[i].a = a;
 		P[i].b = b;
 		
-		double esq = 0.;
-		
         for (int d = 0; d < dim; d++) {
                 
             P[i].r[d] = L * gsl_rng_uniform(generator);
