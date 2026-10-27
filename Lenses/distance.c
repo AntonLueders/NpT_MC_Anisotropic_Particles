@@ -193,7 +193,7 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 			double angle_21 = ScalarAngle(Delta_c2, Delta_inter_one_c2);
 			double angle_22 = ScalarAngle(Delta_c2, Delta_inter_two_c2);
 			
-			if ((angle_11 <= alpha && angle_21 <= alpha) || (angle_12 <= alpha && angle_22 <= alpha)) {
+			if ((angle_11 <= alpha + 1e-10 && angle_21 <= alpha + 1e-10) || (angle_12 <= alpha + 1e-10 && angle_22 <= alpha + 1e-10)) {
 				return -1.;
 			}
 		}
