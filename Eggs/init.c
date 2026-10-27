@@ -45,7 +45,7 @@ void InitRandom(Particle *P, double L) {
 		for (int j = 0; j < i; j++) {
             
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
-			double disji = 0.;
+			double disji = L;
 			if (disij <= b) {
 				disji = DistanceOverlap(&(P[j]), &(P[i]), L);
 			}
