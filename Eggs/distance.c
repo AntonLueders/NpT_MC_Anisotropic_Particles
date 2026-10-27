@@ -88,7 +88,7 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			cos_of_angle_ei_erij += p_i->e[d] * erij[d];
 		}
 		
-		if (cos_of_angle_ei_erij > 0) {
+		if (cos_of_angle_ei_erij >= 0) {
 			ellipse1 = 1;
 			ellipse2 = 0;
 		} else {
@@ -108,7 +108,7 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			cos_of_angle_ei_erij += p_i->e[d] * erij[d];
 		}
 		
-		if (cos_of_angle_ei_erij > 0) {
+		if (cos_of_angle_ei_erij >= 0) {
 			ellipse1 = 1;
 			ellipse2 = 1;
 		} else {
