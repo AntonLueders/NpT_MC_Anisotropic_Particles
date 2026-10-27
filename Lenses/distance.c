@@ -199,7 +199,7 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		}
 	}
 	
-	return 2. * b;
+	return 2. * b; // Returns arbitrary small distance to be small enough for the Verlet list registration.
 }
 
 // ----------------------------------------------------------------------------------------
