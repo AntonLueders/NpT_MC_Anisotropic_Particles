@@ -58,6 +58,10 @@ int MetropolisRotation(int index, Particle *P, double L) {
 	}
 	
 	double esq_norm = sqrt(esq);
+
+	if (esq_norm < 1e-7) {
+		return 0;
+	}
 	
 	for (int d = 0; d < dim; d++) {
 		test_particle.e[d] /= esq_norm; 
