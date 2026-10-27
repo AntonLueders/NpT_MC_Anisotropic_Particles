@@ -21,7 +21,7 @@ int MetropolisTranslation(int index, Particle *P, double L) {
         
 		if (i != index) {
 			double disij = DistanceOverlap(&test_particle, &(P[i]), L);     // See distance.c
-			double disji = 0.;
+			double disji = L;
 			if (disij < b) {
 				disji = Distance(&(P[i]), &test_particle, L, 0);     // See distance.c
 			}
@@ -73,7 +73,7 @@ int MetropolisRotation(int index, Particle *P, double L) {
             
 		if (i != index) {
 			double disij = DistanceOverlap(&test_particle, &(P[i]), L);     // See distance.c
-			double disji = 0.;
+			double disji = L;
 			if (disij < b) {
 				disji = Distance(&(P[i]), &test_particle, L, 0); 
 			}
@@ -119,7 +119,7 @@ double VolumeMCStep(double L, Particle *P) {
 			if (j < i) {
 				
 				double disij = DistanceOverlap(&(test_particles[i]), &(test_particles[j]), L_temp);     // See distance.c
-				double disji = 0.;
+				double disji = L;
 				if (disij < b) {				
 					disji = Distance(&(test_particles[j]), &(test_particles[i]), L_temp, 0);     // See distance.c
 				}
