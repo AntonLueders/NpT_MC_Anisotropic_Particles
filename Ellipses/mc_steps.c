@@ -56,8 +56,8 @@ int MetropolisRotation(int index, Particle *P, double L) {
 
     double esq = 0.;
     for (int d = 0; d < dim; d++) {
-            test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
-            esq += test_particle.e[d] * test_particle.e[d];
+        test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
+        esq += test_particle.e[d] * test_particle.e[d];
     }
 
     double esq_norm = sqrt(esq);
