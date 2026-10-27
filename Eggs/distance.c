@@ -120,14 +120,14 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 		double rij_new[dim];
 		
 		for (int d = 0; d < dim; d++) {
-			rij_new[d] = -(a - 0.5) / 2. * p_i->e[d] + rij[d] + (a - 0.5) / 2. * p_j->e[d];
+			rij_new[d] = -(a - b) / 2. * p_i->e[d] + rij[d] + (a - b) / 2. * p_j->e[d];
 		}
 		
 		double rijei = 0.;
 		double rijej = 0.;
 		double eiej = parallel_check;
-		double l_half_i = (a - 0.5) / 2.;
-		double l_half_j = (a - 0.5) / 2.;
+		double l_half_i = (a - b) / 2.;
+		double l_half_j = (a - b) / 2.;
 		
 		for (int d = 0; d < dim; d++) {
 			
@@ -160,13 +160,13 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			}
 		}
 		
-		if (fabs(lambda_prime + (a - 0.5) / 2.) < 1e-8) {
+		if (fabs(lambda_prime + (a - b) / 2.) < 1e-8) {
 			ellipse1 = 0;
 		} else {
 			ellipse1 = 1;
 		}
 		
-		if (fabs(mu_prime + (a - 0.5) / 2.) < 1e-8) {
+		if (fabs(mu_prime + (a - b) / 2.) < 1e-8) {
 			ellipse2 = 0;
 		} else {
 			ellipse2 = 1;
