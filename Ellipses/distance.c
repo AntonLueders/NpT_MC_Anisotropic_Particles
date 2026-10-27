@@ -214,12 +214,12 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 				alpha_plus_2y = 0.;
 			}
 
-			double minus_3_alpha_plus_2y_plus_2beta_norm = -(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha_plus_2y)));
+			double minus_3_alpha_plus_2y_plus_2beta_norm = -(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha_plus_2y) + 1e-14));
 			if (minus_3_alpha_plus_2y_plus_2beta_norm < 0.) {
 				minus_3_alpha_plus_2y_plus_2beta_norm = 0.;
 			}
 			
-			q = - B / (4. * A) + 0.5 * (sqrt(alpha_plus_2y) + sqrt(double minus_3_alpha_plus_2y_plus_2beta_norm));
+			q = - B / (4. * A) + 0.5 * (sqrt(alpha_plus_2y) + sqrt(minus_3_alpha_plus_2y_plus_2beta_norm));
 		} else {
 
 			double alpha_sq_minus_4_gamma = alpha_sq - 4. * gamma;
