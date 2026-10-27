@@ -220,12 +220,6 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		rijsq += rij[d] * rij[d];
 	}
 	
-	double rijei = 0;
-	for (int d = 0; d < dim; d++) {
-		
-		rijei += rij[d] * p_i->e[d];
-	}
-	
 	double rij_hat[dim];
 	double rij_norm = sqrt(rijsq);
 	
@@ -243,6 +237,11 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		rij_hatei += rij_hat[d] * p_i->e[d];
 		rij_hatej += rij_hat[d] * p_j->e[d];
 		eiej += p_i->e[d] * p_j->e[d];
+	}
+	if (eiej > 1.0) {
+		eiej = 1.0;
+	} else if (eiej < -1.0) {
+		eiej = -1.0;
 	}
 	
 	double check_para = 1.0 - eiej * eiej;
@@ -351,7 +350,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			
 			double P = - alpha_sq / 12. - gamma;
 			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
-			double temp_argument_Q = Q * Q / 4. + P * P * P /27.;
+			double temp_argument_Q = Q * Q / 4. + P * P * P / 27.;
 			if(fabs(temp_argument_Q) < 1e-8 && temp_argument_Q < 0) {
 				temp_argument_Q = - temp_argument_Q;
 			}
@@ -363,9 +362,31 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			} else {
 				y = - 5. / 6. * alpha - cbrt(Q);
 			}
-			q = - B / (4. * A) + 0.5 * (sqrt(alpha + 2. * y) + sqrt(-(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha + 2. * y)))));
+			
+			double alpha_plus_2y = alpha + 2. * y;			
+			if (alpha_plus_2y < 0.) {
+				alpha_plus_2y = 0.;
+			}
+
+			double minus_3_alpha_plus_2y_plus_2beta_norm = -(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha_plus_2y) + 1e-14));
+			if (minus_3_alpha_plus_2y_plus_2beta_norm < 0.) {
+				minus_3_alpha_plus_2y_plus_2beta_norm = 0.;
+			}
+			
+			q = - B / (4. * A) + 0.5 * (sqrt(alpha_plus_2y) + sqrt(minus_3_alpha_plus_2y_plus_2beta_norm));
 		} else {
-			q = - B / (4. * A) + sqrt(0.5 * (- alpha + sqrt(alpha_sq - 4. * gamma)));
+
+			double alpha_sq_minus_4_gamma = alpha_sq - 4. * gamma;
+			if (alpha_sq_minus_4_gamma < 0.) {
+				alpha_sq_minus_4_gamma = 0.;
+			}
+
+			double half_of_minus_alpha_plus_root = 0.5 * (- alpha + sqrt(alpha_sq_minus_4_gamma));
+			if (half_of_minus_alpha_plus_root < 0.) {
+				half_of_minus_alpha_plus_root = 0.;
+			}
+			
+			q = - B / (4. * A) + sqrt(half_of_minus_alpha_plus_root);
 		}
 		
 		double first_pow = 1. + (b2_prime * one_plus_delta) / q;
