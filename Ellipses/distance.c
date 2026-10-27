@@ -197,8 +197,8 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			double P = - alpha_sq / 12. - gamma;
 			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
 			double temp_argument_Q = Q * Q / 4. + P * P * P / 27.;
-			if(fabs(temp_argument_Q) < 1e-8 && temp_argument_Q < 0) {
-				temp_argument_Q = - temp_argument_Q;
+			if (temp_argument_Q < 0.) {
+			    temp_argument_Q = 0.;
 			}
 			double U = cbrt(- Q / 2. + sqrt(temp_argument_Q));
 			
