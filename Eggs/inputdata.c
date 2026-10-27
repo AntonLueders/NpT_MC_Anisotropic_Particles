@@ -156,7 +156,7 @@ void CheckForConflict() {
     }
     
     if (rate > sweeps) {
-        printf("ERROR: Rate must be larger than sweeps.\n");
+        printf("ERROR: Sweeps must be larger than rate.\n");
         exit(1);    
     }
     
