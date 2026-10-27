@@ -27,18 +27,11 @@ void InitRandom(Particle *P, double L) {
         for (int d = 0; d < dim; d++) {
                 
             P[i].r[d] = L * gsl_rng_uniform(generator);
-			// Note that the following algorithm is biased and
-			// does not create fully uniform initial orientations.
-			// However, as only fluids are simulated and the
-			// system equilibrates before data extraction, this
-			// is fine.
-			P[i].e[d] = 2. * (gsl_rng_uniform(generator) - 0.5);
-			esq += P[i].e[d] * P[i].e[d];
 		}
 		
-		for (int d = 0; d < dim; d++) {
-			P[i].e[d] /= sqrt(esq);
-		}
+		double rand_angle = 2. * M_PI * gsl_rng_uniform(generator);
+		P[i].e[0] = cos(rand_angle);
+		P[i].e[1] = sin(rand_angle);
 
 		for (int j = 0; j < i; j++) {
             
