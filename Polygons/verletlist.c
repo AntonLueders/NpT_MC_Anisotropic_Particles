@@ -15,7 +15,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 			
 			double limit = r_v;		// The second term is just a buffer.
 			if (lambda > 1.) {
-				limit += lambda* 0.25 / sin(M_PI / (double)m) * a;
+				limit += lambda * 0.25 / sin(M_PI / (double)m) * a;
 			} else {
 				limit += 0.25 / sin(M_PI / (double)m) * a;
 			}
