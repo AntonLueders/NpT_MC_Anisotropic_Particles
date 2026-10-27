@@ -13,7 +13,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 			
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
 			
-			double limit = (3. * a + r_v);
+			double limit = (3. * b + r_v); \\ Includes a buffer
 			
 			if (disij < 0.) {
 				printf("ERROR: Unexpected overlap after step: %d.\n", step);
