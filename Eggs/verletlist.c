@@ -12,7 +12,7 @@ void GenerateVerletLists(Particle *P, double L, int step) {
 		for (int j = 0; j < i; j++) {
 			
 			double disij = DistanceOverlap(&(P[i]), &(P[j]), L);     // See distance.c
-			if (disij < a + b + r_v) {
+			if (disij < a + b) {
 				double disji = DistanceOverlap(&(P[j]), &(P[i]), L);
 				if (disij < 0. || disji < 0.) {
 					printf("%d\t%d\t%f\n", i, j, disji);
