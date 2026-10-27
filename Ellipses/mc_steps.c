@@ -48,23 +48,27 @@ int MetropolisRotation(int index, Particle *P, double L) {
 	
 	double rand_unity_vector[dim];
 
-        double rand_angle = 2. * M_PI * gsl_rng_uniform(generator);
-        rand_unity_vector[0] = cos(rand_angle);
-        rand_unity_vector[1] = sin(rand_angle);
+    double rand_angle = 2. * M_PI * gsl_rng_uniform(generator);
+    rand_unity_vector[0] = cos(rand_angle);
+    rand_unity_vector[1] = sin(rand_angle);
 
-        Particle test_particle = P[index];
+    Particle test_particle = P[index];
 
-        double esq = 0.;
-        for (int d = 0; d < dim; d++) {
-                test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
-                esq += test_particle.e[d] * test_particle.e[d];
-        }
+    double esq = 0.;
+    for (int d = 0; d < dim; d++) {
+            test_particle.e[d] = test_particle.e[d] + delta_r * rand_unity_vector[d];
+            esq += test_particle.e[d] * test_particle.e[d];
+    }
 
-        double esq_norm = sqrt(esq);
+    double esq_norm = sqrt(esq);
 
-        for (int d = 0; d < dim; d++) {
-                test_particle.e[d] /= esq_norm;
-        }
+	if (esq_norm < 1e-7) {
+		return 0;
+	}
+
+    for (int d = 0; d < dim; d++) {
+            test_particle.e[d] /= esq_norm;
+    }
 
 	Node *current = test_particle.verList->next;
     while (current != NULL) {
