@@ -1,0 +1,13 @@
+N	2000
+p	5.000000
+T	1.000000
+sweeps	50000
+rate	500
+a       
+seed       2728
+delta	0.40000
+delta_r	1.00000
+delta_V	1.100000
+r_v	5.7500
+M     
+lambda       
