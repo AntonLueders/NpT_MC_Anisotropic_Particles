@@ -1,1 +1,1 @@
-
+Here, we present a simple example on how to calculate the EOS for hexagons that are horizontally deformed as characterized by $\delta = 0.5$. As in [1], we want to study a system, where the area of the particles $ A_k(\delta) $ is set to the area of a reference system of circles described by a diameter $ \sigma=1 $. 
