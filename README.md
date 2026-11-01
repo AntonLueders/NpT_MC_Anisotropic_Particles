@@ -71,7 +71,9 @@ The particular lines of such an input file and the meaning of the numbers are su
 
 Note that the word and number separation in the input file should be done with the **tab key** (the program is only tested for this case). The structure of the inputfile of the various shapes is different.
 
-Each of the simulation codes for the different shape families take slightly different input parameters. These required parameters are described in [Parameters.pdf](./Parameters.pdf), which also explains how the simulation parameters connect to the scales used in [1] to characterize the deformations.
+Each of the simulation codes for the different shape families take slightly different input parameters. These required ones are described in [Parameters.pdf](./Parameters.pdf), which also explains how the simulation parameters connect to the scales used in [1] to characterize the deformations.
+
+For an example simulation, see the description in [Examples](Examples/Examples.md).
 
  <a id="Data"></a>
 # How to interprete the generated data
