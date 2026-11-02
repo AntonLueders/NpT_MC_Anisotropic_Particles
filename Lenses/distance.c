@@ -184,7 +184,23 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 			}
 
 			int check_infinit_points = CalculateIntersection(c1, c2, inter_one, inter_two);
-			if(!check_infinit_points) {
+			if (!check_infinit_points) {
+
+				double Delta_c1[dim];
+				double Delta_c2[dim];
+				
+				for (int d = 0; d < dim; d++) {
+
+				    Delta_c1[d] = p_i->r[d] - c1[d];
+				    Delta_c2[d] = p_i->r[d] + rij[d] - c2[d];
+				}
+				
+				double angle_centers = ScalarAngle(Delta_c1, Delta_c2);
+				
+				if (angle_centers <= 2.0 * alpha + 1e-10) {
+				    return -1.0;
+				}
+				
 				continue;
 			}
 			
