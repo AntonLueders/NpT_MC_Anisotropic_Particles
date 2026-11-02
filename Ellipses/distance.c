@@ -30,6 +30,10 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	for (int d = 0; d < dim; d++) {
 		rijsq += PeriodicDis(p_j->r[d] - p_i->r[d], L) * PeriodicDis(p_j->r[d] - p_i->r[d], L);
 	}
+
+	if(sqrt(rijsq) < 2. * b) {
+		return sqrt(rijsq) - 2. * b;
+	}
 	
 	double disij = 0.;
 	if (sqrt(rijsq) < 2.05 * a) {
