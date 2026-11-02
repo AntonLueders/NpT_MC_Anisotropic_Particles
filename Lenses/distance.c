@@ -12,7 +12,7 @@ void RotationMatrix(double *old, double angle, double *newV) {
 
 // ----------------------------------------------------------------------------------------
 
-double ScalarAngle(const double *v1, const double *v2){
+double ScalarAngle(double *v1, double *v2){
     double dot = 0.0;
     double norm1sq = 0.0;
     double norm2sq = 0.0;
