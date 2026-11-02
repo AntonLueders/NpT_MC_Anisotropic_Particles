@@ -183,8 +183,8 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 				continue;
 			}
 
-			int check_infinit_points = CalculateIntersection(c1, c2, inter_one, inter_two);
-			if (!check_infinit_points) {
+			int has_two_intersects = CalculateIntersection(c1, c2, inter_one, inter_two);
+			if (!has_two_intersects) {
 
 				double Delta_c1[dim];
 				double Delta_c2[dim];
