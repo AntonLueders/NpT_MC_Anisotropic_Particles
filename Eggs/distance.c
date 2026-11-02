@@ -30,7 +30,7 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 	for (int d = 0; d < dim; d++) {
 		rijsq += PeriodicDis(p_j->r[d] - p_i->r[d], L) * PeriodicDis(p_j->r[d] - p_i->r[d], L);
 	}
-
+	
 	if(sqrt(rijsq) < 2. * b) {
 		return sqrt(rijsq) - 2. * b;
 	}
@@ -71,59 +71,29 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 		rij[d] = PeriodicDis(p_j->r[d] - p_i->r[d], L);
 		rijsq += rij[d] * rij[d];
 	}
-
-	/*
-	 * Check whether the two internal egg line segments intersect.
-	 *
-	 * Segment i:
-	 *     p_i->r  -->  p_i->r + (a-b) e_i
-	 *
-	 * Segment j:
-	 *     p_i->r + rij  -->  p_i->r + rij + (a-b) e_j
-	 *
-	 * The segments are inside their respective eggs. Therefore, if
-	 * they intersect, the eggs necessarily overlap.
-	 *
-	 * Return 0 in that case.
-	 */
+	
+	//Check whether the two internal egg line segments intersect.
 	{
 		double segment_length = a - b;
 
-		/* Start point of segment i is chosen as the local origin. */
+		// Start point of segment i is chosen as the local origin.
 		double qx = rij[0];
 		double qy = rij[1];
 
-		/* Direction vectors of the two finite internal segments. */
+		// Direction vectors of the two finite internal segments.
 		double rx = segment_length * p_i->e[0];
 		double ry = segment_length * p_i->e[1];
 
 		double sx = segment_length * p_j->e[0];
 		double sy = segment_length * p_j->e[1];
 
-		/*
-		 * 2D cross product r x s.
-		 *
-		 * If nonzero, the segments are not parallel and there is one
-		 * possible intersection of their infinite supporting lines.
-		 */
 		double cross_rs = rx * sy - ry * sx;
-
-		/*
-		 * q x r, where q is the vector from the start of segment i
-		 * to the start of segment j.
-		 */
 		double cross_qr = qx * ry - qy * rx;
 
 		if (fabs(cross_rs) > 1e-12) {
 
-			/*
-			 * Segment intersection parameters:
-			 *
-			 * p_i->r + t r = p_i->r + rij + u s
-			 *
-			 * Intersection lies on both finite segments if:
-			 * 0 <= t <= 1 and 0 <= u <= 1.
-			 */
+			// Segment intersection parameters:
+			// p_i->r + t r = p_i->r + rij + u s
 			double t = (qx * sy - qy * sx) / cross_rs;
 			double u = cross_qr / cross_rs;
 
@@ -133,22 +103,12 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 			}
 
 		} else {
-			/*
-			 * Parallel segments.
-			 *
-			 * They can intersect only if they are collinear.
-			 */
+
+			// Parallel segments.
 			double cross_qs = qx * sy - qy * sx;
 
 			if (fabs(cross_qs) <= 1e-12) {
 
-				/*
-				 * Collinear case. Project both endpoints of segment j
-				 * onto segment i's parameter t.
-				 *
-				 * Segment i: t in [0, 1].
-				 * Segment j: t in [t0, t1].
-				 */
 				double r_sq = rx * rx + ry * ry;
 
 				double t0 = (qx * rx + qy * ry) / r_sq;
@@ -157,9 +117,6 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 				double t_min = fmin(t0, t1);
 				double t_max = fmax(t0, t1);
 
-				/*
-				 * The intervals [0,1] and [t_min,t_max] overlap.
-				 */
 				if (t_max >= -1e-12 && t_min <= 1.0 + 1e-12) {
 					return 0;
 				}
@@ -244,18 +201,15 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 		if (fabs(lambda_prime) > l_half_i || fabs(mu_prime) > l_half_j) {
 			double aux1 = fabs(lambda_prime) - l_half_i;
 			double aux2 = fabs(mu_prime) - l_half_j;
-
 			if (aux1 > aux2) {
 				lambda_prime = Sign(l_half_i, lambda_prime);
 				mu_prime = lambda_prime * eiej - rijej;
-
 				if (fabs(mu_prime) > l_half_j) {
 					mu_prime = Sign(l_half_j, mu_prime);
 				}
 			} else {
 				mu_prime = Sign(l_half_j, mu_prime);
 				lambda_prime = mu_prime * eiej + rijei;
-
 				if(fabs(lambda_prime) > l_half_i) {
 					lambda_prime = Sign(l_half_i, lambda_prime);
 				}
@@ -277,7 +231,7 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	
 	ends[0] = ellipse1;
 	ends[1] = ellipse2;
-
+	
 	return 1;
 }
 
@@ -287,36 +241,14 @@ int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 // Implemented following the supporting informations of
 // Zheng, X. & Palffy-Muhoray, P. Distance of closest approach of two arbitrary hard ellipses in two dimensions.
 // Phys. Rev. E 75, 061709; 10.1103/PhysRevE.75.061709 (2007).
-double Distance(Particle *p_i, Particle *p_j, double L, int state) {
+double DistanceEllipses(Particle *p_i, Particle *p_j, double L, int state) {
 	
-	int ends[2];
-	int check_no_inter = IdentifyEnds(p_i, p_j, L, ends);
-
-	if (!check_no_inter) {
-		return -1.;
-	}
+	double a1 = p_i->a;
+	double b1 = p_i->b;
+	double ecc1 = p_i->ecc;
 	
-	double a1;
-	double b1;	
-	if (ends[0] == 1) {
-		a1 = p_i->a;
-		b1 = p_i->b;
-	} else {
-		a1 = p_i->b * 1.001;
-		b1 = p_i->b;		
-	}	
-	double ecc1 = sqrt(1. - b1 * b1 / (a1 * a1));
-	
-	double a2;
-	double b2;
-	if (ends[1] == 1) {
-		a2 = p_j->a;
-		b2 = p_j->b;
-	} else {
-		a2 = p_j->b * 1.001;
-		b2 = p_j->b;		
-	}
-	double ecc2 = sqrt(1. - b2 * b2 / (a2 * a2));
+	double b2 = p_j->b;
+	double ecc2 = p_j->ecc;
 	
 	double eta = a1 / b1 - 1.;
 	
@@ -459,8 +391,8 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			double P = - alpha_sq / 12. - gamma;
 			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
 			double temp_argument_Q = Q * Q / 4. + P * P * P / 27.;
-			if (temp_argument_Q < 0.) {
-			    temp_argument_Q = 0.;
+			if (temp_argument_Q < 0.0) {
+				temp_argument_Q = 0.;
 			}
 			double U = cbrt(- Q / 2. + sqrt(temp_argument_Q));
 			
@@ -512,6 +444,187 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	}
 	
 	return rij_norm - d;
+}
+
+// ----------------------------------------------------------------------------------------
+
+// Distance between disk-shaped ends
+double DistanceDisks(Particle *p_i, Particle *p_j, double L) {
+	
+	double rijsq = 0.;
+	for (int d = 0; d < dim; d++) {
+		rijsq += PeriodicDis(p_j->r[d] - p_i->r[d], L) * PeriodicDis(p_j->r[d] - p_i->r[d], L);
+	}
+	
+	return sqrt(rijsq) - 2. * b;
+}
+
+// ----------------------------------------------------------------------------------------
+
+// Signed surface distance between a disk and an ellipse.
+double DistanceDiskEllipse(Particle *p_circle, Particle *p_ellipse, double L) {
+
+    // Tolerances
+    double tol_F = 1e-8;         	// residual tolerance on F(lambda) 
+    double tol_lambda_rel = 1e-8;	// relative tolerance on bracket width 
+    int    max_iter = 30;         	// iterations of hybrid solver 
+
+    double R = p_circle->b;
+
+    double a_ellipse = p_ellipse->a;
+    double b_ellipse = p_ellipse->b;
+
+    double rx = PeriodicDis(p_circle->r[0] - p_ellipse->r[0], L);
+    double ry = PeriodicDis(p_circle->r[1] - p_ellipse->r[1], L);
+
+    // Ellipse body-frame basis. 
+    double ex = p_ellipse->e[0];
+    double ey = p_ellipse->e[1];
+    double epx = -ey;
+    double epy = ex;
+
+    // Disk-center coordinates in ellipse frame. 
+    double x = rx * ex + ry * ey;
+    double y = rx * epx + ry * epy;
+
+    double a_sq = a_ellipse * a_ellipse;
+    double b_sq = b_ellipse * b_ellipse;
+
+    double ellipse_coordinate = x * x / a_sq + y * y / b_sq;
+    if (ellipse_coordinate <= 1.) {
+        return -R;
+    }
+	
+    double lambda_lo = 0.;
+
+    // Find an upper bracket lambda_hi with F(lambda_hi) <= 0.
+    double lambda_hi = a_sq + b_sq; 		// reasonable starting scale 
+    double denom_a_hi = a_sq + lambda_hi;
+    double denom_b_hi = b_sq + lambda_hi;
+
+    double F_hi = a_sq * x * x / (denom_a_hi * denom_a_hi)
+                + b_sq * y * y / (denom_b_hi * denom_b_hi)
+                - 1.;
+
+    int guard = 0;
+    while (F_hi > 0.) {
+        lambda_hi *= 2.;
+        denom_a_hi = a_sq + lambda_hi;
+        denom_b_hi = b_sq + lambda_hi;
+
+        F_hi = a_sq * x * x / (denom_a_hi * denom_a_hi)
+             + b_sq * y * y / (denom_b_hi * denom_b_hi)
+             - 1.;
+
+        if (++guard > 100) {
+            printf("ERROR: Could not bracket disk-ellipse closest-point root.\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Start hybrid solve at the mid-bracket
+    double lambda = 0.5 * (lambda_lo + lambda_hi);
+
+    for (int iter = 0; iter < max_iter; iter++) {
+
+        double denom_a = a_sq + lambda;
+        double denom_b = b_sq + lambda;
+
+        double Fa = a_sq * x * x / (denom_a * denom_a);
+        double Fb = b_sq * y * y / (denom_b * denom_b);
+
+        double F = Fa + Fb - 1.;
+
+        if (fabs(F) < tol_F) {
+            break;
+        }
+        if ((lambda_hi - lambda_lo) <= tol_lambda_rel * (1.0 + lambda_hi)) {
+            break;
+        }
+
+        // Derivative: F'(lambda) < 0 for lambda >= 0
+        double Fp = -2.0 * a_sq * x * x / (denom_a * denom_a * denom_a)
+                    -2.0 * b_sq * y * y / (denom_b * denom_b * denom_b);
+
+        // Update bracket using F sign at current lambda 
+        if (F > 0.) {
+            // lambda too small 
+            lambda_lo = lambda;
+        } else {
+            // lambda too large 
+            lambda_hi = lambda;
+        }
+
+        // Attempt a Newton step, safeguarded by the bracket 
+        double take_newton = 1.;
+        double lambda_new = lambda;
+
+        if (!(isfinite(Fp)) || Fp >= 0.) {
+            take_newton = 0;
+        } else {
+            double step = F / Fp;  // Fp < 0, so this moves the right way 
+            lambda_new = lambda - step;
+
+            if (!(isfinite(lambda_new)) ||
+                lambda_new <= lambda_lo ||
+                lambda_new >= lambda_hi) {
+                take_newton = 0;
+            }
+        }
+
+        if (!take_newton) {
+            // Fall back to bisection for this iteration
+            lambda_new = 0.5 * (lambda_lo + lambda_hi);
+        }
+
+        lambda = lambda_new;
+    }
+
+    // Closest point on ellipse boundary (ellipse frame) 
+    double X = a_sq * x / (a_sq + lambda);
+    double Y = b_sq * y / (b_sq + lambda);
+
+    // Distance from disk center to ellipse boundary
+    double dx = x - X;
+    double dy = y - Y;
+    double point_to_ellipse_distance = sqrt(dx * dx + dy * dy);
+
+    // Contact distance
+    return point_to_ellipse_distance - R;
+}
+
+// ----------------------------------------------------------------------------------------
+
+double Distance(Particle *p_i, Particle *p_j, double L, int state) {
+	
+	int ends[2];
+	int check_no_inter = IdentifyEnds(p_i, p_j, L, ends);
+
+	if (!check_no_inter) {
+		return -1.;
+	}
+	
+	if (ends[0] == 0 && ends[1] == 0) {
+		//printf("CircleCircle\n");
+		return DistanceDisks(p_i, p_j, L);
+	}
+
+	if (ends[0] == 0 && ends[1] == 1) {
+		//printf("CircleEps\n");
+		return DistanceDiskEllipse(p_i, p_j, L);
+	}
+
+	if (ends[0] == 1 && ends[1] == 0) {
+		//printf("EpsCircle\n");
+		return DistanceDiskEllipse(p_j, p_i, L);
+	}
+
+	if (ends[0] == 1 && ends[1] == 1) {
+		//printf("EpsEps\n");
+		return DistanceEllipses(p_i, p_j, L, state);
+	}
+	
+	return -1.;
 }
 
 // ----------------------------------------------------------------------------------------
