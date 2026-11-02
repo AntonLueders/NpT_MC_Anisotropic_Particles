@@ -83,7 +83,7 @@ double DistanceOverlap(Particle *p_i, Particle *p_j, double L) {
 
 // ----------------------------------------------------------------------------------------
 
-void CalculateIntersection(double *center_one, double *center_two, double *inter_one, double *inter_two) {
+int CalculateIntersection(double *center_one, double *center_two, double *inter_one, double *inter_two) {
 	
 	double diss = 0.;
 	double diss_vec[dim];
@@ -94,10 +94,9 @@ void CalculateIntersection(double *center_one, double *center_two, double *inter
 	}
 	
 	diss = sqrt(diss);
-	
+
 	if (diss < pow(10., -8.)) {
-		printf("ERROR: Circle intersection error.");
-        exit(1);
+		return 0;
 	}
 	
 	double x = diss / 2.;
@@ -114,6 +113,8 @@ void CalculateIntersection(double *center_one, double *center_two, double *inter
 	
 	inter_two[0] = center_one[0] + x * diss_vec[0] / diss + y * diss_vec[1] / diss;
 	inter_two[1] = center_one[1] + x * diss_vec[1] / diss - y * diss_vec[0] / diss;
+
+	return 1;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -133,7 +134,9 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		return -1.;
 	}
 	
-	double alpha = asin(a / R);
+	double ratio = a / R;
+	ratio = fmax(-1.0, fmin(1.0, ratio));
+	double alpha = asin(ratio);
 	
 	double e_perp_i[dim];
 	double e_perp_j[dim];
@@ -179,8 +182,11 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 			if(diss_c1_c2 > 2. * R) {
 				continue;
 			}
-			
-			CalculateIntersection(c1, c2, inter_one, inter_two);
+
+			int check_infinit_points = CalculateIntersection(c1, c2, inter_one, inter_two);
+			if(!check_infinit_points) {
+				continue;
+			}
 			
 			double Delta_c1[dim];
 			double Delta_inter_one_c1[dim];
