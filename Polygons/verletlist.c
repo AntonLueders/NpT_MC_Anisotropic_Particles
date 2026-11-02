@@ -72,8 +72,8 @@ bool CheckVerlet(Particle *P, double L) {
 	}
 	
 	double buffer = sqrt(2.) * delta / 2.;
-	if (2. * a > buffer) {
-		buffer = 2. * a;
+	if (2. / sin(M_PI / (double)m) * a > buffer) {
+		buffer = 1. / sin(M_PI / (double)m) * a;
 	}
 	if (2. * sqrt(2.) * L *(1. - sqrt(1. - delta_V / (2. * L * L))) > buffer) {
 		buffer = 2. * sqrt(2.) * L *(1. - sqrt(1. - delta_V / (2. * L * L)));
