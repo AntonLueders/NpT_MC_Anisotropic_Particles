@@ -59,7 +59,7 @@ double Sign(double value, double sign) {
 
 // This function identifies which ends are interacting to properly assign either the disk
 // or the ellipse shape
-void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
+int IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	
 	int ellipse1 = 0;
 	int ellipse2 = 0;
@@ -70,6 +70,101 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	for (int d = 0; d < dim; d++) {
 		rij[d] = PeriodicDis(p_j->r[d] - p_i->r[d], L);
 		rijsq += rij[d] * rij[d];
+	}
+
+	/*
+	 * Check whether the two internal egg line segments intersect.
+	 *
+	 * Segment i:
+	 *     p_i->r  -->  p_i->r + (a-b) e_i
+	 *
+	 * Segment j:
+	 *     p_i->r + rij  -->  p_i->r + rij + (a-b) e_j
+	 *
+	 * The segments are inside their respective eggs. Therefore, if
+	 * they intersect, the eggs necessarily overlap.
+	 *
+	 * Return 0 in that case.
+	 */
+	{
+		double segment_length = a - b;
+
+		/* Start point of segment i is chosen as the local origin. */
+		double qx = rij[0];
+		double qy = rij[1];
+
+		/* Direction vectors of the two finite internal segments. */
+		double rx = segment_length * p_i->e[0];
+		double ry = segment_length * p_i->e[1];
+
+		double sx = segment_length * p_j->e[0];
+		double sy = segment_length * p_j->e[1];
+
+		/*
+		 * 2D cross product r x s.
+		 *
+		 * If nonzero, the segments are not parallel and there is one
+		 * possible intersection of their infinite supporting lines.
+		 */
+		double cross_rs = rx * sy - ry * sx;
+
+		/*
+		 * q x r, where q is the vector from the start of segment i
+		 * to the start of segment j.
+		 */
+		double cross_qr = qx * ry - qy * rx;
+
+		if (fabs(cross_rs) > 1e-12) {
+
+			/*
+			 * Segment intersection parameters:
+			 *
+			 * p_i->r + t r = p_i->r + rij + u s
+			 *
+			 * Intersection lies on both finite segments if:
+			 * 0 <= t <= 1 and 0 <= u <= 1.
+			 */
+			double t = (qx * sy - qy * sx) / cross_rs;
+			double u = cross_qr / cross_rs;
+
+			if (t >= -1e-12 && t <= 1. + 1e-12 &&
+			    u >= -1e-12 && u <= 1. + 1e-12) {
+				return 0;
+			}
+
+		} else {
+			/*
+			 * Parallel segments.
+			 *
+			 * They can intersect only if they are collinear.
+			 */
+			double cross_qs = qx * sy - qy * sx;
+
+			if (fabs(cross_qs) <= 1e-12) {
+
+				/*
+				 * Collinear case. Project both endpoints of segment j
+				 * onto segment i's parameter t.
+				 *
+				 * Segment i: t in [0, 1].
+				 * Segment j: t in [t0, t1].
+				 */
+				double r_sq = rx * rx + ry * ry;
+
+				double t0 = (qx * rx + qy * ry) / r_sq;
+				double t1 = ((qx + sx) * rx + (qy + sy) * ry) / r_sq;
+
+				double t_min = fmin(t0, t1);
+				double t_max = fmax(t0, t1);
+
+				/*
+				 * The intervals [0,1] and [t_min,t_max] overlap.
+				 */
+				if (t_max >= -1e-12 && t_min <= 1.0 + 1e-12) {
+					return 0;
+				}
+			}
+		}
 	}
 	
 	double parallel_check = 0;
@@ -149,15 +244,18 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 		if (fabs(lambda_prime) > l_half_i || fabs(mu_prime) > l_half_j) {
 			double aux1 = fabs(lambda_prime) - l_half_i;
 			double aux2 = fabs(mu_prime) - l_half_j;
+
 			if (aux1 > aux2) {
 				lambda_prime = Sign(l_half_i, lambda_prime);
 				mu_prime = lambda_prime * eiej - rijej;
+
 				if (fabs(mu_prime) > l_half_j) {
 					mu_prime = Sign(l_half_j, mu_prime);
 				}
 			} else {
 				mu_prime = Sign(l_half_j, mu_prime);
 				lambda_prime = mu_prime * eiej + rijei;
+
 				if(fabs(lambda_prime) > l_half_i) {
 					lambda_prime = Sign(l_half_i, lambda_prime);
 				}
@@ -179,6 +277,8 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 	
 	ends[0] = ellipse1;
 	ends[1] = ellipse2;
+
+	return 1;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -190,7 +290,11 @@ void IdentifyEnds(Particle *p_i, Particle *p_j, double L, int ends[2]) {
 double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	int ends[2];
-	IdentifyEnds(p_i, p_j, L, ends);
+	int check_no_inter = IdentifyEnds(p_i, p_j, L, ends);
+
+	if (!check_no_inter) {
+		return -1.;
+	}
 	
 	double a1;
 	double b1;	
