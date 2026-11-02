@@ -72,7 +72,19 @@ bool CheckVerlet(Particle *P, double L) {
 		}
 	}
 	
-	return (sqrt(dissq_max[0]) + sqrt(dissq_max[1])) >= (r_v - delta);
+	double buffer = sqrt(2.) * delta / 2.;
+	if (2. * a > buffer) {
+		buffer = 2. * a;
+	}
+	if (2. * sqrt(2.) * L *(1. - sqrt(1. - delta_V / (2. * L * L))) > buffer) {
+		buffer = 2. * sqrt(2.) * L *(1. - sqrt(1. - delta_V / (2. * L * L)));
+	}
+	if (buffer > r_v) {
+		printf("ERROR: Buffer larger than Verlet radius.\n");
+        exit(1);  
+	}
+	
+	return (sqrt(dissq_max[0]) + sqrt(dissq_max[1])) >= (r_v - buffer);
 }
 
 // ----------------------------------------------------------------------------------------
