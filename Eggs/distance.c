@@ -289,7 +289,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		
 		if (A11 >= A22) {			
 			e_p_primed_prime = 1. / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1_div_a1 * rij_hatei;
-		} else if (A22 < A11) {
+		} else if (A22 > A11) {
 			double temp_argument_e_p_primed_prime = 1. - rij_hat_ei_sq;
 			if (temp_argument_e_p_primed_prime < 0.) {
 				temp_argument_e_p_primed_prime = 0.;
