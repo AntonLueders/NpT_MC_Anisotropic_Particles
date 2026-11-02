@@ -12,19 +12,31 @@ void RotationMatrix(double *old, double angle, double *newV) {
 
 // ----------------------------------------------------------------------------------------
 
-double ScalarAngle(double *v1, double *v2) {
-	
-	double result = 0.;
-	double abs_v1 = 0.; 
-	double abs_v2 = 0.;
-	
-	for (int d = 0; d < dim; d++) {
-		result += v1[d] * v2[d];
-		abs_v1 += v1[d] * v1[d];
-		abs_v2 += v2[d] * v2[d];
-	}
-	
-	return acos(result / sqrt(abs_v1) / sqrt(abs_v2));
+double ScalarAngle(const double *v1, const double *v2){
+    double dot = 0.0;
+    double norm1sq = 0.0;
+    double norm2sq = 0.0;
+
+    for (int d = 0; d < dim; d++) {
+        dot     += v1[d] * v2[d];
+        norm1sq += v1[d] * v1[d];
+        norm2sq += v2[d] * v2[d];
+    }
+
+    if (norm1sq <= 0.0 || norm2sq <= 0.0) {
+        fprintf(stderr, "ERROR: zero vector passed to ScalarAngle.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double cos_angle = dot / sqrt(norm1sq * norm2sq);
+
+    if (cos_angle > 1.0) {
+        cos_angle = 1.0;
+    } else if (cos_angle < -1.0) {
+        cos_angle = -1.0;
+    }
+
+    return acos(cos_angle);
 }
 
 // ----------------------------------------------------------------------------------------
