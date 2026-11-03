@@ -95,7 +95,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	}
 	
 	double check_para = 1.0 - eiej * eiej;
-	if (check_para  < 1e-10) {
+	if (check_para < 1e-10) {
 		
 		if (eiej / fabs(eiej) < 0.) {
 			eiej = - eiej;
@@ -157,6 +157,13 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		e_p_primed_prime = factor * (term1 + term2);
 	}
 	
+	if (e_p_primed_prime > 1.)  {
+		e_p_primed_prime = 1.;
+	}
+	if (e_p_primed_prime < -1.) {
+		e_p_primed_prime = -1.;
+	}
+	
 	double a2_prime = 1. / sqrt(lambda_m);
 	double b2_prime = 1. / sqrt(lambda_p);
 	
@@ -169,7 +176,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	if (fabs(e_p_primed_prime) < 1e-8 || fabs(delta_dis) < 1e-8) {
 		
 		d_prime = 1. + a2_prime;
-	} else if (fabs(fabs(e_p_primed_prime) - 1.) < 1e-8 && state == 0) { 
+	} else if (fabs(fabs(e_p_primed_prime) - 1.) < 1e-8 && state == 0) {
 		return Distance(p_j, p_i, L, 1);
 	} else {
 		
@@ -201,10 +208,19 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			double P = - alpha_sq / 12. - gamma;
 			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
 			double temp_argument_Q = Q * Q / 4. + P * P * P / 27.;
+			if(temp_argument_Q < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (temp_argument_Q).\n");
+				exit(1);
+			}			
 			if (temp_argument_Q < 0.) {
 			    temp_argument_Q = 0.;
 			}
+			
 			double U = cbrt(- Q / 2. + sqrt(temp_argument_Q));
+			if(isnan(U) || isinf(U)) {
+				printf("ERROR: Unexpected result while computing the distance (U).\n");
+				exit(1);
+			}
 			
 			double y = 0.;
 			if (fabs(U) > 1e-8) {
@@ -213,43 +229,80 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 				y = - 5. / 6. * alpha - cbrt(Q);
 			}
 			
-			double alpha_plus_2y = alpha + 2. * y;			
+			double alpha_plus_2y = alpha + 2. * y;	
+			if (alpha_plus_2y < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (alpha_plus_2y).\n");
+				exit(1);
+			}			
 			if (alpha_plus_2y < 0.) {
 				alpha_plus_2y = 0.;
 			}
 
 			double minus_3_alpha_plus_2y_plus_2beta_norm = -(3. * alpha + 2. * y + 2. * beta / (sqrt(alpha_plus_2y) + 1e-14));
+			if(isnan(minus_3_alpha_plus_2y_plus_2beta_norm) || isinf(minus_3_alpha_plus_2y_plus_2beta_norm)) {
+				printf("ERROR: Unexpected result while computing the distance (minus_3_alpha_plus_2y_plus_2beta_norm).\n");
+				exit(1);
+			}
+			if (minus_3_alpha_plus_2y_plus_2beta_norm < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (minus_3_alpha_plus_2y_plus_2beta_norm negative).\n");
+				exit(1);
+			}
 			if (minus_3_alpha_plus_2y_plus_2beta_norm < 0.) {
 				minus_3_alpha_plus_2y_plus_2beta_norm = 0.;
 			}
 			
 			q = - B / (4. * A) + 0.5 * (sqrt(alpha_plus_2y) + sqrt(minus_3_alpha_plus_2y_plus_2beta_norm));
+			if(isnan(q) || isinf(q)) {
+				printf("ERROR: Unexpected result while computing the distance (q).\n");
+				exit(1);
+			}
 		} else {
 
 			double alpha_sq_minus_4_gamma = alpha_sq - 4. * gamma;
+			if (alpha_sq_minus_4_gamma < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (alpha_sq_minus_4_gamma).\n");
+				exit(1);
+			}
 			if (alpha_sq_minus_4_gamma < 0.) {
 				alpha_sq_minus_4_gamma = 0.;
 			}
 
 			double half_of_minus_alpha_plus_root = 0.5 * (- alpha + sqrt(alpha_sq_minus_4_gamma));
+			if (isnan(half_of_minus_alpha_plus_root) || isinf(half_of_minus_alpha_plus_root)) {
+				printf("ERROR: Unexpected result while computing the distance (half_of_minus_alpha_plus_root).\n");
+				exit(1);
+			}
+			if (half_of_minus_alpha_plus_root < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (half_of_minus_alpha_plus_root negative).\n");
+				exit(1);
+			}
 			if (half_of_minus_alpha_plus_root < 0.) {
 				half_of_minus_alpha_plus_root = 0.;
 			}
 			
 			q = - B / (4. * A) + sqrt(half_of_minus_alpha_plus_root);
+			if(isnan(q) || isinf(q)) {
+				printf("ERROR: Unexpected result while computing the distance (q at beta = 0).\n");
+				exit(1);
+			}
 		}
 		
 		double first_pow = 1. + (b2_prime * one_plus_delta) / q;
 		double second_pow = 1. + b2_prime / q;
 		double qsq_minus_one = (q * q - 1.);
 		
-		d_prime = sqrt(qsq_minus_one / delta_dis * first_pow * first_pow + (1. - qsq_minus_one / delta_dis) * second_pow * second_pow);
+		double argument_d_prime = qsq_minus_one / delta_dis * first_pow * first_pow + (1. - qsq_minus_one / delta_dis) * second_pow * second_pow;
+		if (argument_d_prime < 0.) {
+			argument_d_prime = 0.;
+		}
+		
+		d_prime = sqrt(argument_d_prime);
 	}
 	
 	d = d_prime / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1;
 	
 	if(isnan(d) || isinf(d)) {
-		printf("ERROR: Unexpected result while computing the distance.");
+		printf("ERROR: Unexpected result while computing the distance (end).\n");
 		exit(1);
 	}
 	
