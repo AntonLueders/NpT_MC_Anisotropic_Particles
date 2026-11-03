@@ -482,11 +482,24 @@ double DistanceEllipses(Particle *p_i, Particle *p_j, double L, int state) {
 		double qsq_minus_one = (q * q - 1.);
 		
 		double argument_d_prime = qsq_minus_one / delta_dis * first_pow * first_pow + (1. - qsq_minus_one / delta_dis) * second_pow * second_pow;
+		if(argument_d_prime < -1e-8) {
+			printf("ERROR: Unexpected result while computing the distance (argument_d_prime).\n");
+			exit(1);
+		}		
 		if (argument_d_prime < 0.) {
 			argument_d_prime = 0.;
 		}
 		
 		d_prime = sqrt(argument_d_prime);
+	}
+	
+	double d_prime_end_argument = 1. - ecc1_sq * rij_hat_ei_sq;
+	if(d_prime_end_argument  < -1e-8) {
+		printf("ERROR: Unexpected result while computing the distance (d_prime_end_argument).\n");
+		exit(1);
+	}		
+	if (d_prime_end_argument  < 0.) {
+		d_prime_end_argument = 0.;
 	}
 	
 	d = d_prime / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1;
