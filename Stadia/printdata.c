@@ -10,14 +10,10 @@ void PrintOvito(FILE *f, Particle *P, int step, double L) {
 	for (int i = 0; i < N; i++) {	
 	
 		double phi = atan2(P[i].e[1], P[i].e[0]);
-		double w =  0.5 * sqrt(1. + cos(phi));
-		double x = sin(phi) / (4.*w);
-		double y = -(cos(phi)+1.)/(4.*w);
-		double z =  sin(phi)/(4.*w);
-
+	
 		fprintf(f, "s1\t%f\t%f", P[i].r[0], P[i].r[1]);
-		fprintf(f, "\t%f\t%f\t%f\t%f", w,x,y,z);
-		fprintf(f, "\t%f\t%f\t", P[i].sigma / 2., (P[i].q - 1.) * P[i].sigma);
+		fprintf(f, "\t%f\t%f", cos(phi / 2.), sin(phi / 2.));
+		fprintf(f, "\t%f\t%f\t%f\t", q, sigma, sigma);
 		fprintf(f, "%f\n", L);
 	}
 }
