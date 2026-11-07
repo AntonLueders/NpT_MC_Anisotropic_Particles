@@ -257,10 +257,19 @@ double Distance(Particle *p_i, Particle *p_j, double L) {
 		Compress(vector_to_corner_i, p_i->e);
 		Compress(vector_to_corner_j, p_j->e);
 	} else {
-		double e_perp_i[2] = {-p_i->e[1], p_i->e[0]};
-		double e_perp_j[2] = {-p_j->e[1], p_j->e[0]};
-		Compress(vector_to_corner_i, e_perp_i);
-		Compress(vector_to_corner_j, e_perp_j);
+		if (m == 6) {
+			double e_perp_i[2] = {-p_i->e[1], p_i->e[0]};
+			double e_perp_j[2] = {-p_j->e[1], p_j->e[0]};
+			Compress(vector_to_corner_i, e_perp_i);
+			Compress(vector_to_corner_j, e_perp_j);
+		} else {
+			double e_mid_i[2];
+			double e_mid_j[2];
+			RotationMatrix(p_i->e, M_PI / (double)m, e_mid_i);
+			RotationMatrix(p_j->e, M_PI / (double)m, e_mid_j);
+			Compress(vector_to_corner_i, e_mid_i);
+			Compress(vector_to_corner_j, e_mid_j);
+		}		
 	}
 
 	// Vectors from the system origin to the vertices
