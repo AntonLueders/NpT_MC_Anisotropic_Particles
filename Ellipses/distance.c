@@ -104,7 +104,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		rij_hatej = -1.;
 	}
 
-	// Replace e_j with -e_j if the particle are more antiparallel than parallel
+	// Replace e_j with -e_j if the particle are antiparallel
 	double check_para = 1. - eiej * eiej;
 	if (check_para < 1e-10) {
 		
@@ -156,7 +156,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 				exit(1);
 			}			
 			if (argument_e_p_primed_prime < 0.) {
-				argument_e_p_primed_prime 1e-14;
+				argument_e_p_primed_prime = 1e-14;
 			}
 			
 			e_p_primed_prime = 1. / (sqrt(argument_e_p_primed_prime)) * b1_div_a1 * rij_hatei;
@@ -193,10 +193,10 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			exit(1);
 		}			
 		if (argument_e_p_primed_prime < 0.) {
-			argument_e_p_primed_prime = 1e-14;
+			argument_e_p_primed_prime = 1e-16;
 		}
 		
-		double factor = 1. / (sqrt(2.) * sqrt(A12_sq + lambda_m_A11 * lambda_m_A11) * sqrt(argument_e_p_primed_prime));
+		double factor = 1. / (sqrt(2.) * sqrt(A12_sq + lambda_m_A11 * lambda_m_A11 + 1e-16) * sqrt(argument_e_p_primed_prime));
 
 		if (one_plus_eiej < -1e-8) {
 			printf("ERROR: Unexpected result while computing the distance (one_plus_eiej).\n");
@@ -214,7 +214,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		}
 		
 		double term1 = A12 / (sqrt(one_plus_eiej)) * (b1_div_a1 * rij_hatei + rij_hatej + (b1_div_a1 - 1.) * rij_hat_eiej);
-		double term2 = (lambda_p - A11) / (sqrt(one_minus_eiej)) * (b1_div_a1 * rij_hatei - rij_hatej - (b1_div_a1 - 1.) * rij_hat_eiej);
+		double term2 = lambda_m_A11 / (sqrt(one_minus_eiej)) * (b1_div_a1 * rij_hatei - rij_hatej - (b1_div_a1 - 1.) * rij_hat_eiej);
 		
 		e_p_primed_prime = factor * (term1 + term2);
 	}
@@ -286,6 +286,10 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			double Q = - alpha * alpha_sq / 108. + alpha * gamma / 3. - beta * beta / 8.;
 			double temp_argument_Q = Q * Q / 4. + P * P * P / 27.;
 			if(temp_argument_Q < -1e-8) {
+				// The system can have a real root even if temp_argument_Q is smaller than
+				// zero. Then a complex implementation must be usef. For ellipses with
+				// equal aspect ratio and area, we have not encountered such a case.
+				// To be sure, the program ends if the real implementation fails.
 				printf("ERROR: Unexpected result while computing the distance (temp_argument_Q).\n");
 				exit(1);
 			}			
@@ -386,7 +390,7 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		exit(1);
 	}		
 	if (d_prime_end_argument  < 0.) {
-		d_prime_end_argument = 0.;
+		d_prime_end_argument = 1e-16;
 	}
 	
 	d = d_prime / (sqrt(d_prime_end_argument )) * b1;
