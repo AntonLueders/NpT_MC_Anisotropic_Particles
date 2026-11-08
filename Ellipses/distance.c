@@ -88,13 +88,24 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 		rij_hatej += rij_hat[d] * p_j->e[d];
 		eiej += p_i->e[d] * p_j->e[d];
 	}
-	if (eiej > 1.0) {
-		eiej = 1.0;
-	} else if (eiej < -1.0) {
-		eiej = -1.0;
+	if (eiej > 1.) {
+		eiej = 1.;
+	} else if (eiej < -1.) {
+		eiej = -1.;
 	}
-	
-	double check_para = 1.0 - eiej * eiej;
+	if (rij_hatei > 1.) {
+		rij_hatei = 1.;
+	} else if (rij_hatei < -1.) {
+		rij_hatei = -1.;
+	}
+	if (rij_hatej > 1.) {
+		rij_hatej = 1.;
+	} else if (rij_hatej < -1.) {
+		rij_hatej = -1.;
+	}
+
+	// Replace e_j with -e_j if the particle are more antiparallel than parallel
+	double check_para = 1. - eiej * eiej;
 	if (check_para < 1e-10) {
 		
 		if (eiej / fabs(eiej) < 0.) {
@@ -137,20 +148,71 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	
 	if (check_para  < 1e-10) {
 		
-		if (A11 >= A22) {			
-			e_p_primed_prime = 1. / (sqrt(1. - ecc1_sq * rij_hat_ei_sq)) * b1_div_a1 * rij_hatei;
-		} else if (A22 > A11) {
+		if (A11 >= A22) {	
+			double argument_e_p_primed_prime = 1. - ecc1_sq * rij_hat_ei_sq;
+
+			if (argument_e_p_primed_prime < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (argument_e_p_primed_prime).\n");
+				exit(1);
+			}			
+			if (argument_e_p_primed_prime < 0.) {
+				argument_e_p_primed_prime 1e-14;
+			}
+			
+			e_p_primed_prime = 1. / (sqrt(argument_e_p_primed_prime)) * b1_div_a1 * rij_hatei;
+		} else if (A22 > A11) {			
 			double temp_argument_e_p_primed_prime = 1. - rij_hat_ei_sq;
+
+			if (temp_argument_e_p_primed_prime < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (temp_argument_e_p_primed_prime).\n");
+				exit(1);
+			}			
 			if (temp_argument_e_p_primed_prime < 0.) {
 				temp_argument_e_p_primed_prime = 0.;
 			}
-			e_p_primed_prime = sqrt(temp_argument_e_p_primed_prime) / (sqrt(1. - ecc1_sq * rij_hat_ei_sq));
+
+			double argument_e_p_primed_prime = 1. - ecc1_sq * rij_hat_ei_sq;
+
+			if (argument_e_p_primed_prime < -1e-8) {
+				printf("ERROR: Unexpected result while computing the distance (argument_e_p_primed_prime).\n");
+				exit(1);
+			}			
+			if (argument_e_p_primed_prime < 0.) {
+				argument_e_p_primed_prime = 1e-14;
+			}
+			
+			e_p_primed_prime = sqrt(temp_argument_e_p_primed_prime) / (sqrt(argument_e_p_primed_prime));
 		}
 	} else {
 		
 		double lambda_m_A11 = lambda_p - A11;
+		double argument_e_p_primed_prime = 1. - ecc1_sq * rij_hat_ei_sq;
+
+		if (argument_e_p_primed_prime < -1e-8) {
+			printf("ERROR: Unexpected result while computing the distance (argument_e_p_primed_prime).\n");
+			exit(1);
+		}			
+		if (argument_e_p_primed_prime < 0.) {
+			argument_e_p_primed_prime = 1e-14;
+		}
 		
-		double factor = 1. / (sqrt(2.) * sqrt(A12_sq + lambda_m_A11 * lambda_m_A11) * sqrt(1. - ecc1_sq * rij_hat_ei_sq));
+		double factor = 1. / (sqrt(2.) * sqrt(A12_sq + lambda_m_A11 * lambda_m_A11) * sqrt(argument_e_p_primed_prime));
+
+		if (one_plus_eiej < -1e-8) {
+			printf("ERROR: Unexpected result while computing the distance (one_plus_eiej).\n");
+			exit(1);
+		}			
+		if (one_plus_eiej < 0.) {
+			one_plus_eiej = 1e-14;
+		}
+		if (one_minus_eiej < -1e-8) {
+			printf("ERROR: Unexpected result while computing the distance (one_minus_eiej).\n");
+			exit(1);
+		}			
+		if (one_minus_eiej < 0.) {
+			one_minus_eiej = 1e-14;
+		}
+		
 		double term1 = A12 / (sqrt(one_plus_eiej)) * (b1_div_a1 * rij_hatei + rij_hatej + (b1_div_a1 - 1.) * rij_hat_eiej);
 		double term2 = (lambda_p - A11) / (sqrt(one_minus_eiej)) * (b1_div_a1 * rij_hatei - rij_hatej - (b1_div_a1 - 1.) * rij_hat_eiej);
 		
@@ -162,6 +224,21 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 	}
 	if (e_p_primed_prime < -1.) {
 		e_p_primed_prime = -1.;
+	}
+
+	if (lambda_m < -1e-8) {
+		printf("ERROR: Unexpected result while computing the distance (lambda_m).\n");
+		exit(1);
+	}			
+	if (lambda_m < 0.) {
+		lambda_m = 1e-14;
+	}
+	if (lambda_p < -1e-8) {
+		printf("ERROR: Unexpected result while computing the distance (lambda_p).\n");
+		exit(1);
+	}			
+	if (lambda_p < 0.) {
+		lambda_p = 1e-14;
 	}
 	
 	double a2_prime = 1. / sqrt(lambda_m);
@@ -287,8 +364,8 @@ double Distance(Particle *p_i, Particle *p_j, double L, int state) {
 			}
 		}
 		
-		double first_pow = 1. + (b2_prime * one_plus_delta) / q;
-		double second_pow = 1. + b2_prime / q;
+		double first_pow = 1. + (b2_prime * one_plus_delta) / (q + 1e-14);
+		double second_pow = 1. + b2_prime / (q + 1e-14);
 		double qsq_minus_one = (q * q - 1.);
 		
 		double argument_d_prime = qsq_minus_one / delta_dis * first_pow * first_pow + (1. - qsq_minus_one / delta_dis) * second_pow * second_pow;
