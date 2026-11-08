@@ -690,8 +690,8 @@ double DistanceDiskEllipse(Particle *p_circle, Particle *p_ellipse, double L) {
         }
 
         // Derivative: F'(lambda) < 0 for lambda >= 0
-        double Fp = -2.0 * a_sq * x * x / (denom_a * denom_a * denom_a)
-                    -2.0 * b_sq * y * y / (denom_b * denom_b * denom_b);
+        double Fp = -2. * a_sq * x * x / (denom_a * denom_a * denom_a)
+                    -2. * b_sq * y * y / (denom_b * denom_b * denom_b);
 
         // Update bracket using F sign at current lambda 
         if (F > 0.) {
