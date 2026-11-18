@@ -13,6 +13,7 @@ The corresponding folders contain individual programs for the different hard con
  - [Contents of the particular files](#Contents)
  - [Disclaimer](#Disclaimer)
  - [Cite this software](#Cite)
+ - [Additional folders](#EOS)
 
  <a id="Requirements"></a>
 # Requirements and how to build the executables
@@ -112,3 +113,8 @@ Note that the presented code is **not** an ongoing software project with active 
 If you use this simulation software or parts of it, please cite
 
 [1] Lüders, A., Franosch, T., and Schilling, R. *How the number of vertices determines the thermodynamics of fluids of hard polygons*.
+
+ <a id="EOS"></a>
+# Additional folders
+
+This repository also contains the folder **EOS_Data** with data of all EOS curves calculated in the context of [1]. If this data is used, please cite [1].
